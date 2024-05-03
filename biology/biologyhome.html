@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生物学學習台</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header, footer {
+            background-color: #204051;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #3b6978;
+            padding: 20px 0;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #84a9ac;
+            border: none;
+            color: white;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #cae8d5;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 0.8rem;
+        }
+
+        .introduction {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .featured-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .logo {
+            display: block;
+            margin: 10px auto;
+            width: 80px;
+            animation: spin 20s linear infinite;
+        }
+    </style>
+    <script src="https://apis.google.com/js/api:client.js"></script>
+</head>
+<body>
+    <header>
+        <h1>生物學習平台</h1>
+        <img src="bernese.JPG" alt="學習平台Logo" class="logo">
+    </header>
+    <nav>
+        <button id="google-login-btn">使用 Google 帳號登錄</button>
+        <ul>
+            <li><a href="biologylesson.html">課程學習</a></li>
+            <li><a href="biologyquiz.html">測驗</a></li>
+            <li><a href="videos.html">教學影片</a></li>
+        </ul>
+    </nav>
+    <div class="introduction">
+        <h2>歡迎来到生物學習平台</h2>
+        <p>這裏你可以學習到有關哺乳累和節肢動物的有趣知識。</p>
+    </div>
+    <img src="home.jpg" alt="Featured Animal" class="featured-image">
+    <footer>
+        <p>版權所有 © 生物學習平台</p>
+    </footer>
+    <script>
+        let googleAuth;
+
+function initGoogleAuth() {
+    gapi.load('auth2', function() {
+        googleAuth = gapi.auth2.init({
+            client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'
+        });
+        googleAuth.then(function() {
+            updateLoginStatus();
+        });
+    });
+}
+
+function updateLoginStatus() {
+    if (googleAuth.isSignedIn.get()) {
+        let googleUser = googleAuth.currentUser.get();
+        let profile = googleUser.getBasicProfile();
+        let userName = profile.getName();
+        let loginButton = document.getElementById('google-login-btn');
+        loginButton.textContent = userName;
+        loginButton.onclick = function() {
+            window.location.href = 'profile.html'; // 假设个人档案页面是 'profile.html'
+        };
+    }
+}
+
+document.getElementById('google-login-btn').addEventListener('click', function() {
+    if (!googleAuth.isSignedIn.get()) {
+        googleAuth.signIn().then(function(googleUser) {
+            updateLoginStatus();
+        }).catch(function(error) {
+            console.error("Error signing in: ", error);
+        });
+    } else {
+        // 如果已经登录，点击按钮会跳转到个人档案页面
+        window.location.href = 'profile.html';
+    }
+});
+
+window.onload = function() {
+    initGoogleAuth();
+};
+    </script>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: ""AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+    authDomain: "biologylearning-s11055013.firebaseapp.com",
+    databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
+    projectId: "biologylearning-s11055013",
+    storageBucket: "biologylearning-s11055013.appspot.com",
+    messagingSenderId: "743496923725",
+    appId: "1:743496923725:web:866adef56bd80b02d53a04"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+</body>
+</html>

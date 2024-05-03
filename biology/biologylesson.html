@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程學習 - 生物學習平台</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header, footer {
+            background-color: #204051;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        h1, h2 {
+            margin: 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #3b6978;
+            padding: 20px 0;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #84a9ac;
+            border: none;
+            color: white;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #cae8d5;
+        }
+
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 0.8rem;
+        }
+
+        .course-item {
+            background-color: #ffffff;
+            margin: 10px auto;
+            padding: 20px;
+            width: 80%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .course-item h3 {
+            color: #204051;
+        }
+
+        .course-item p {
+            text-align: left;
+        }
+    </style>
+    <script src="https://apis.google.com/js/api:client.js"></script>
+</head>
+<body>
+    <header>
+        <h1>生物學習平台</h1>
+    </header>
+    <nav>
+        <button id="google-login-btn">使用 Google 帳號登錄</button>
+        <ul>
+            <li><a href="biologyhome.html">首頁</a></li>
+            <li><a href="biologylesson.html">課程學習</a></li>
+            <li><a href="biologyquiz.html">測驗</a></li>
+            <li><a href="videos.html">教學影片</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <h2>課程學習</h2>
+        <div class="course-item">
+            <h3>哺乳動物介紹</h3>
+            <p>學習各種哺乳動物的基本特徵和分類。</p>
+        </div>
+        <div class="course-item">
+            <h3>節肢動物的世界</h3>
+            <p>探索節肢動物的多樣性，包括昆蟲、蛛形動物等。</p>
+        </div>
+    </div>
+    <footer>
+        <p>版權所有 © 生物學習平台</p>
+    </footer>
+    <script>
+        let googleAuth;
+
+        function initGoogleAuth() {
+            gapi.load('auth2', function() {
+                googleAuth = gapi.auth2.init({
+                    client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'
+                });
+            });
+        }
+
+        document.getElementById('google-login-btn').addEventListener('click', function() {
+            if (googleAuth) {
+                googleAuth.signIn().then(function(googleUser) {
+                    console.log("User signed in: ", googleUser.getBasicProfile().getName());
+                    // 这里可以重定向到主页面或执行其他逻辑
+                }).catch(function(error) {
+                    console.error("Error signing in: ", error);
+                });
+            }
+        });
+
+        window.onload = function() {
+            initGoogleAuth();
+        };
+       
+    </script>
+</body>
+</html>
