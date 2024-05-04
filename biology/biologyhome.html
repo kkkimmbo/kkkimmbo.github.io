@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="google-signin-client_id" content="130442278978-j29rl7r5srslikgar49cu0616e24icep.apps.googleusercontent.com">
-    <title>生物學習平台</title>
+    <title>生物学學習平台</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,41 +11,34 @@
             padding: 0;
             background-color: #f4f4f9;
         }
-
         header, footer {
             background-color: #204051;
             color: white;
             text-align: center;
             padding: 10px 0;
         }
-
         h1 {
             margin: 0;
         }
-
         nav {
             display: flex;
             justify-content: center;
             background-color: #3b6978;
             padding: 20px 0;
         }
-
         nav ul {
             list-style-type: none;
             padding: 0;
         }
-
         nav ul li {
             display: inline;
             margin-right: 10px;
         }
-
         nav ul li a {
             text-decoration: none;
             color: white;
             font-weight: bold;
         }
-
         button {
             padding: 10px 20px;
             cursor: pointer;
@@ -54,32 +47,26 @@
             color: white;
             border-radius: 5px;
         }
-
         button:hover {
             background-color: #cae8d5;
         }
-
         footer p {
             margin: 0;
             font-size: 0.8rem;
         }
-
         .introduction {
             padding: 20px;
             text-align: center;
         }
-
         .featured-image {
             width: 100%;
             height: auto;
             display: block;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
         .logo {
             display: block;
             margin: 10px auto;
@@ -90,8 +77,8 @@
 </head>
 <body>
     <header>
-        <h1>生物學習平台</h1>
-        <img src="bernese.JPG" alt="學習平台Logo" class="logo">
+        <h1>生物学習平台</h1>
+        <img src="bernese.JPG" alt="学習平台Logo" class="logo">
     </header>
     <nav>
         <button id="google-login-btn">使用 Google 帳號登錄</button>
@@ -99,80 +86,84 @@
         <ul>
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
-            <li><a href="videos.html">教學影片</a></li>
+            <li><a href="videos.html">教学视频</a></li>
         </ul>
     </nav>
     <div class="introduction">
-        <h2>歡迎来到生物學習平台</h2>
-        <p>這裏你可以學習到有關哺乳累和節肢動物的有趣知識。</p>
+        <h2>欢迎来到生物学习平台</h2>
+        <p>这里你可以学习到关于哺乳类和节肢动物的有趣知识。</p>
         <div id="user-info"></div>
     </div>
     <img src="home.jpg" alt="Featured Animal" class="featured-image">
     <footer>
-        <p>版權所有 © 生物學習平台</p>
+        <p>版权所有 © 生物学习平台</p>
     </footer>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
-
     <script>
-      // Your web app's Firebase configuration
-      var firebaseConfig = {
-        apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-        authDomain: "biologylearning-s11055013.firebaseapp.com",
-        databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
-        projectId: "biologylearning-s11055013",
-        storageBucket: "biologylearning-s11055013.appspot.com",
-        messagingSenderId: "743496923725",
-        appId: "1:743496923725:web:866adef56bd80b02d53a04"
-      };
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
+        var firebaseConfig = {
+            apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+            authDomain: "biologylearning-s11055013.firebaseapp.com",
+            databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
+            projectId: "biologylearning-s11055013",
+            storageBucket: "biologylearning-s11055013.appspot.com",
+            messagingSenderId: "743496923725",
+            appId: "1:743496923725:web:866adef56bd80b02d53a04"
+        };
+        firebase
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+var provider = new firebase.auth.GoogleAuthProvider();
 
-      // Initialize Google Authentication provider
-      var provider = new firebase.auth.GoogleAuthProvider();
+firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+        document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
+        document.getElementById('logout-btn').style.display = 'block';
+        document.getElementById('google-login-btn').style.display = 'none';
+    } else {
+        document.getElementById('user-info').innerHTML = '';
+        document.getElementById('logout-btn').style.display = 'none';
+        document.getElementById('google-login-btn').style.display = 'block';
+    }
+});
 
-      firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-          // User is signed in.
-          document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
-          document.getElementById('logout-btn').style.display = 'block';
-          document.getElementById('google-login-btn').style.display = 'none';
-        } else {
-          // No user is signed in.
-          document.getElementById('user-info').innerHTML = '';
-          document.getElementById('logout-btn').style.display = 'none';
-          document.getElementById('google-login-btn').style.display = 'block';
-        }
-      });
+function signInWithGoogle() {
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        var token = result.credential.accessToken;
+        // The signed-in user info.
+        var user = result.user;
+        // ...
+    }).catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        // The email of the user's account used.
+        var email = error.email;
+        // The firebase.auth.AuthCredential type that was used.
+        var credential = error.credential;
+        // ...
+    });
+}
 
-      function signInWithGoogle() {
-        firebase.auth()
-          .signInWithPopup(provider)
-          .then((result) => {
-            // This gives you a Google Access Token. You can use it to access the Google API.
-            var token = result.credential.accessToken;
-            // The signed-in user info.
-            var user = result.user;
-            // ...
-          }).catch((error) => {
-            // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            // The email of the user's account used.
-            var email = error.email;
-            // The firebase.auth.AuthCredential type that was used.
-            var credential = error.credential;
-            // ...
-          });
-      }
+function signOut() {
+    firebase.auth().signOut().then(function() {
+        console.log('User signed out.');
+    }).catch(function(error) {
+        console.error('Sign out Error', error);
+    });
+}
 
-      function signOut() {
-        firebase.auth().signOut().then(function() {
-          console.log('Signed Out');
-        }, function(error) {
-          console.error('Sign Out Error', error);
-        });
-      }
-    </script>
+document.addEventListener('DOMContentLoaded', function() {
+    var loginButton = document.getElementById('google-login-btn');
+    if (loginButton) {
+        loginButton.addEventListener('click', signInWithGoogle);
+    }
+    var logoutButton = document.getElementById('logout-btn');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', signOut);
+    }
+});
+</script>
 </body>
 </html>
