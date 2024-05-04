@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>教學影片 - 生物學習平台</title>
+    <title>教學视频 - 生物學習平台</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -63,21 +63,22 @@
             text-align: center;
         }
         .video-container {
-            margin: 20px auto;
-            max-width: 80%;
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            margin-bottom: 20px;
         }
-        iframe {
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 450px; /* Adjust height accordingly */
+            height: 100%;
         }
         footer p {
             margin: 0;
             font-size: 0.8rem;
-        }
-        .featured-image {
-            width: 100%;
-            height: auto;
-            display: block;
         }
         .logo {
             display: block;
@@ -102,16 +103,16 @@
             <li><a href="biologyhome.html">首頁</a></li>
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
-            <li><a href="biologyprofile.html">個人檔案</a></li>
-            <li><a href="biologyvideos.html">教學影片</a></li>
+            <li><a href="biologyvideos.html">教學视频</a></li>
+            <li><a href='biologyprofile.html'>個人檔案</a></li>
         </ul>
         <button id="google-login-btn">使用 Google 帳號登錄</button>
         <button id="logout-btn" style="display: none;">登出</button>
     </nav>
     <div class="content">
-        <h2>教學影片</h2>
+        <h2>教學视频</h2>
         <div class="video-container">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/LGxmZqQBOdU?si=XFVtuwuEi8Lr0iGL" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/LGxmZqQBOdU?si=_bLOlDGc6AM8WVDr" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
         <div class="video-container">
             <iframe width="560" height="315" src="https://www.youtube.com/embed/mRidGna-V4E?si=UjcSp786EQiSb4YV" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -120,58 +121,32 @@
     <footer>
         <p>版權所有 © 生物學習平台</p>
     </footer>
-    
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
     <script>
-        // Your web app's Firebase configuration
+        // Initialize Firebase
         var firebaseConfig = {
             apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
             authDomain: "biologylearning-s11055013.firebaseapp.com",
-            databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
             projectId: "biologylearning-s11055013",
             storageBucket: "biologylearning-s11055013.appspot.com",
             messagingSenderId: "743496923725",
             appId: "1:743496923725:web:866adef56bd80b02d53a04"
         };
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-    
-        // Initialize Google Authentication provider
-        var provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({
-            'prompt': 'select_account'  // This will force account selection even if single account is available.
-        });
-    
+
         // Handle authentication state changes
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
-                // User is signed in.
                 document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
                 document.getElementById('logout-btn').style.display = 'inline';
                 document.getElementById('google-login-btn').style.display = 'none';
             } else {
-                // No user is signed in.
                 document.getElementById('user-info').textContent = '未登录';
                 document.getElementById('logout-btn').style.display = 'none';
                 document.getElementById('google-login-btn').style.display = 'inline';
             }
         });
-    
-        // Sign in function
-        document.getElementById('google-login-btn').addEventListener('click', function() {
-            firebase.auth().signInWithPopup(provider).catch(function(error) {
-                console.error('Sign in failed: ', error);
-            });
-        });
-    
-        // Sign out function
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            firebase.auth().signOut().then(function() {
-                console.log('User signed out.');
-            }).catch(function(error) {
-                console.error('Sign out Error', error);
-            });
-        });
     </script>
-    
 </body>
 </html>
