@@ -86,8 +86,8 @@
         <ul>
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
-            <li><a href="biologyvideos.html">教学视频</a></li>
-             <li><a href='biologyprofile.html'>個人檔案</a></li>
+            <li><a href="videos.html">教学视频</a></li>
+            <li><a href='biologyprofile.html'>個人檔案</a></li>
         </ul>
     </nav>
     <div class="introduction">
@@ -170,6 +170,23 @@
                 logoutButton.addEventListener('click', signOut);
             }
         });
+        function signInWithGoogle() {
+    // 設定每次登入都能選擇帳號
+    provider.setCustomParameters({
+        prompt: 'select_account'
+    });
+
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+        var token = result.credential.accessToken;
+        var user = result.user;
+        console.log('Signed in as: ' + user.displayName);
+    }).catch(function(error) {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.error('Sign in failed: ', errorCode, errorMessage);
+    });
+}
+
     </script>
     
 </body>
