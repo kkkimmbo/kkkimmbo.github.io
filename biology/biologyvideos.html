@@ -134,7 +134,13 @@
         };
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-
+    
+        // Initialize Google Authentication provider
+        var provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({
+            'prompt': 'select_account'  // This will force account selection even if single account is available.
+        });
+    
         // Handle authentication state changes
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
@@ -149,15 +155,14 @@
                 document.getElementById('google-login-btn').style.display = 'inline';
             }
         });
-
+    
         // Sign in function
         document.getElementById('google-login-btn').addEventListener('click', function() {
-            var provider = new firebase.auth.GoogleAuthProvider();
             firebase.auth().signInWithPopup(provider).catch(function(error) {
                 console.error('Sign in failed: ', error);
             });
         });
-
+    
         // Sign out function
         document.getElementById('logout-btn').addEventListener('click', function() {
             firebase.auth().signOut().then(function() {
@@ -167,5 +172,6 @@
             });
         });
     </script>
+    
 </body>
 </html>
