@@ -162,6 +162,25 @@ footer p {
                 console.error('Sign out Error', error);
             });
         });
+        // Initialize Google Authentication provider
+var provider = new firebase.auth.GoogleAuthProvider();
+provider.setCustomParameters({
+    prompt: 'select_account'
+});
+
+// Sign in function
+function signInWithGoogle() {
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+        var token = result.credential.accessToken;
+        var user = result.user;
+        console.log('Signed in as: ' + user.displayName);
+    }).catch(function(error) {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.error('Sign in failed: ', errorCode, errorMessage);
+    });
+}
+
     </script>
     
     
