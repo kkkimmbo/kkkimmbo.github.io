@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>教學影片 - 生物學習平台</title>
+    <title>课程学习 - 生物学习平台</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,73 +52,50 @@
         button:hover {
             background-color: #cae8d5;
         }
-        #user-info {
-            color: white;
-            flex-grow: 1;
-            text-align: left;
-            padding-left: 20px;
-        }
         .content {
             padding: 20px;
             text-align: center;
         }
-        .video-container {
-            margin: 20px auto;
-            max-width: 80%;
-        }
-        iframe {
-            width: 100%;
-            height: 450px; /* Adjust height accordingly */
+        .course-item {
+            background-color: #ffffff;
+            margin: 10px auto;
+            padding: 20px;
+            width: 80%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: left;
         }
         footer p {
             margin: 0;
             font-size: 0.8rem;
         }
-        .featured-image {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .logo {
-            display: block;
-            margin: auto;
-            width: 80px;
-            animation: spin 20s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
     <header>
-        <h1>生物學習平台</h1>
-        <img src="bernese.JPG" alt="學習平台Logo" class="logo">
+        <h1>生物学习平台</h1>
     </header>
     <nav>
-        <div id="user-info">未登录</div>
         <ul>
-            <li><a href="biologyhome.html">首頁</a></li>
-            <li><a href="biologylesson.html">課程學習</a></li>
-            <li><a href="biologyquiz.html">測驗</a></li>
-            <li><a href="biologyprofile.html">個人檔案</a></li>
-            <li><a href="biologyvideos.html">教學影片</a></li>
+            <li><a href="biologyhome.html">首页</a></li>
+            <li><a href="biologylesson.html">课程学习</a></li>
+            <li><a href="biologyquiz.html">测试</a></li>
+            <li><a href="biologyvideos.html">教学视频</a></li>
         </ul>
-        <button id="google-login-btn">使用 Google 帳號登錄</button>
-        <button id="logout-btn" style="display: none;">登出</button>
+        <button id="google-login-btn">使用 Google 帐号登录</button>
     </nav>
     <div class="content">
-        <h2>教學影片</h2>
-        <div class="video-container">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/LGxmZqQBOdU?si=XFVtuwuEi8Lr0iGL" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <h2>课程学习</h2>
+        <div class="course-item">
+            <h3>哺乳动物介绍</h3>
+            <p>学习各种哺乳动物的基本特征和分类。</p>
         </div>
-        <div class="video-container">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/mRidGna-V4E?si=UjcSp786EQiSb4YV" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <div class="course-item">
+            <h3>节肢动物的世界</h3>
+            <p>探索节肢动物的多样性，包括昆虫、蛛形动物等。</p>
         </div>
     </div>
     <footer>
-        <p>版權所有 © 生物學習平台</p>
+        <p>版权所有 © 生物学习平台</p>
     </footer>
     
         <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
