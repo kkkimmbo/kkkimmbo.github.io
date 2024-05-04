@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="google-signin-client_id" content="130442278978-j29rl7r5srslikgar49cu0616e24icep.apps.googleusercontent.com">
-    <title>生物学學習台</title>
+    <title>生物學習平台</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -87,7 +87,6 @@
             animation: spin 20s linear infinite;
         }
     </style>
-    <script src="https://apis.google.com/js/api:client.js"></script>
 </head>
 <body>
     <header>
@@ -96,6 +95,7 @@
     </header>
     <nav>
         <button id="google-login-btn">使用 Google 帳號登錄</button>
+        <button id="logout-btn" style="display: none;">登出</button>
         <ul>
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
@@ -105,6 +105,7 @@
     <div class="introduction">
         <h2>歡迎来到生物學習平台</h2>
         <p>這裏你可以學習到有關哺乳累和節肢動物的有趣知識。</p>
+        <div id="user-info"></div>
     </div>
     <img src="home.jpg" alt="Featured Animal" class="featured-image">
     <footer>
@@ -112,8 +113,7 @@
     </footer>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
-    <script src="https://apis.google.com/js/api.js"></script>
-    
+
     <script>
       // Your web app's Firebase configuration
       var firebaseConfig = {
@@ -125,44 +125,54 @@
         messagingSenderId: "743496923725",
         appId: "1:743496923725:web:866adef56bd80b02d53a04"
       };
-    
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
-    
+
       // Initialize Google Authentication provider
       var provider = new firebase.auth.GoogleAuthProvider();
-    
-      // Function to handle sign in with Google
+
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          // User is signed in.
+          document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
+          document.getElementById('logout-btn').style.display = 'block';
+          document.getElementById('google-login-btn').style.display = 'none';
+        } else {
+          // No user is signed in.
+          document.getElementById('user-info').innerHTML = '';
+          document.getElementById('logout-btn').style.display = 'none';
+          document.getElementById('google-login-btn').style.display = 'block';
+        }
+      });
+
       function signInWithGoogle() {
         firebase.auth()
           .signInWithPopup(provider)
           .then((result) => {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            var token = result.credential.accessToken;
+            // The signed-in user info.
             var user = result.user;
-            console.log('Name: ' + user.displayName);
-            console.log('Email: ' + user.email);
-            // Optional: Update UI or redirect as needed
-            updateUserInfo(user);
+            // ...
           }).catch((error) => {
-            console.error('Error signing in with Google: ', error);
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // The email of the user's account used.
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+            // ...
           });
       }
-    
-      // Function to update user info on the webpage
-      function updateUserInfo(user) {
-        var userInfoDiv = document.getElementById('user-info');
-        if (userInfoDiv) {
-          userInfoDiv.innerHTML = 'Hello, ' + user.displayName + ' (' + user.email + ')';
-        }
+
+      function signOut() {
+        firebase.auth().signOut().then(function() {
+          console.log('Signed Out');
+        }, function(error) {
+          console.error('Sign Out Error', error);
+        });
       }
-    
-      // Event listener for Google login button
-      document.addEventListener('DOMContentLoaded', function() {
-        var loginButton = document.getElementById('google-login-btn');
-        if (loginButton) {
-          loginButton.addEventListener('click', signInWithGoogle);
-        }
-      });
     </script>
-    
 </body>
 </html>
