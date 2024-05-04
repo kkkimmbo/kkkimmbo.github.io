@@ -187,13 +187,4 @@ footer p {
         });
     });
 
-    // Sign out function
-    document.getElementById('logout-btn').addEventListener('click', function() {
-        firebase.auth().signOut().then(function() {
-            console.log('User signed out.');
-            window.location.href = 'biologyhome.html'; // Redirect to home page after sign out
-        }).catch(function(error) {
-            console.error('Sign out Error', error);
-        });
-    });
 </script>
