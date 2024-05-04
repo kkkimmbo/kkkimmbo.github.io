@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>动物分类测验 - 生物学习平台</title>
+    <title>動物分類測驗 - 生物學習平台</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,30 +17,29 @@
             text-align: center;
             padding: 10px 0;
         }
-        h1, h2 {
-            margin: 0;
-        }
         nav {
             display: flex;
             justify-content: center;
+            align-items: center;
             background-color: #3b6978;
-            padding: 20px 0;
+            padding: 10px 20px;
         }
         nav ul {
             list-style-type: none;
             padding: 0;
+            display: flex;
+            margin: 0;
         }
         nav ul li {
-            display: inline;
-            margin-right: 10px;
+            margin-right: 20px;
         }
-        nav ul li a, nav button {
+        nav ul li:last-child {
+            margin-right: 0;
+        }
+        nav ul li a {
             text-decoration: none;
             color: white;
             font-weight: bold;
-            background: none;
-            border: none;
-            cursor: pointer;
         }
         button {
             padding: 10px 20px;
@@ -52,6 +51,12 @@
         }
         button:hover {
             background-color: #cae8d5;
+        }
+        #user-info {
+            color: white;
+            flex-grow: 1;
+            text-align: left;
+            padding-left: 20px;
         }
         .content {
             padding: 20px;
@@ -83,189 +88,79 @@
 </head>
 <body>
     <header>
-        <h1>生物学习平台</h1>
+        <h1>生物學習平台</h1>
     </header>
     <nav>
-        <button id="google-login-btn">使用 Google 账户登录</button>
+        <div id="user-info">未登录</div>
         <ul>
-            <li><a href="biologyhome.html">首页</a></li>
-            <li><a href="biologylesson.html">课程学习</a></li>
-            <li><a href="biologyquiz.html">测验</a></li>
-            <li><a href="biologyvideos.html">教学视频</a></li>
-            <li><a href='biologyprofile.html'>個人檔案</li>
+            <li><a href="biologyhome.html">首頁</a></li>
+            <li><a href="biologylesson.html">課程學習</a></li>
+            <li><a href="biologyquiz.html">測驗</a></li>
+            <li><a href="biologyvideos.html">教學视频</a></li>
+            <li><a href='biologyprofile.html'>個人檔案</a></li>
         </ul>
+        <button id="google-login-btn">使用 Google 帳號登錄</button>
+        <button id="logout-btn" style="display: none;">登出</button>
     </nav>
     <div class="content">
-        <h2>动物分类测验</h2>
-        <form id="quiz-form">
-            <!-- 具体的题目和答案选项 -->
-            <div class="quiz-item">
-                <p>问题1: 哺乳动物通过什么呼吸?</p>
-                <ul>
-                    <li><input type="radio" name="q1" value="C"> A. 皮肤</li>
-                    <li><input type="radio" name="q1" value="G"> B. 鳃</li>
-                    <li><input type="radio" name="q1" value="L"> C. 肺</li>
-                    <li><input type="radio" name="q1" value="T"> D. 触须</li>
-                </ul>
-            </div>
-            <div class="quiz-item">
-                <p>问题2: 鱼类通常通过什么呼吸?</p>
-                <ul>
-                    <li><input type="radio" name="q2" value="L"> A. 肺</li>
-                    <li><input type="radio" name="q2" value="G"> B. 鳃</li>
-                    <li><input type="radio" name="q2" value="S"> C. 皮肤</li>
-                    <li><input type="radio" name="q2" value="T"> D. 触须</li>
-                </ul>
-            </div>
-            <div class="quiz-item">
-                <p>问题3: 哪种动物属于哺乳纲?</p>
-                <ul>
-                    <li><input type="radio" name="q3" value="W"> A. 鲸鱼</li>
-                    <li><input type="radio" name="q3" value="F"> B. 鲨鱼</li>
-                    <li><input type="radio" name="q3" value="S"> C. 鳗鱼</li>
-                    <li><input type="radio" name="q3" value="T"> D. 海龟</li>
-                </ul>
-            </div>
-            <div class="quiz-item">
-                <p>问题4: 哪种动物是冷血动物?</p>
-                <ul>
-                    <li><input type="radio" name="q4" value="F"> A. 狗</li>
-                    <li><input type="radio" name="q4" value="T"> B. 蟾蜍</li>
-                    <li><input type="radio" name="q4" value="F"> C. 鸡</li>
-                    <li><input type="radio" name="q4" value="F"> D. 羊</li>
-                </ul>
-            </div>
-            <div class="quiz-item">
-                <p>问题5: 节肢动物的特征不包括哪一项?</p>
-                <ul>
-                    <li><input type="radio" name="q5" value="T"> A. 绿色的血液</li>
-                    <li><input type="radio" name="q5" value="F"> B. 外骨骼</li>
-                    <li><input type="radio" name="q5" value="F"> C. 节段化的身体</li>
-                    <li><input type="radio" name="q5" value="F"> D. 关节化的附肢</li>
-                </ul>
-            </div>
-            <div class="quiz-item">
-                <p>问题6: 蝙蝠属于哪一类动物?</p>
-                <ul>
-                    <li><input type="radio" name="q6" value="B"> A. 鸟类</li>
-                    <li><input type="radio" name="q6" value="M"> B. 哺乳动物</li>
-                    <li><input type="radio" name="q6" value="R"> C. 爬行动物</li>
-                    <li><input type="radio" name="q6" value="A"> D. 两栖动物</li>
-                </ul>
-            </div>
-            <div class="quiz-item">
-                <p>问题7: 哪类动物通常具有羽毛?</p>
-                <ul>
-                    <li><input type="radio" name="q7" value="M"> A. 哺乳动物</li>
-                    <li><input type="radio" name="q7" value="B"> B. 鸟类</li>
-                    <li><input type="radio" name="q7" value="F"> C. 鱼类</li>
-                    <li><input type="radio" name="q7" value="R"> D. 爬行动物</li>
-                </ul>
-            </div>
-            <div class="quiz-item">
-                <p>问题8: 猫属于哪一个科?</p>
-                <ul>
-                    <li><input type="radio" name="q8" value="C"> A. 犬科</li>
-                    <li><input type="radio" name="q8" value="F"> B. 鹦鹉科</li>
-                    <li><input type="radio" name="q8" value="F"> C. 猫科</li>
-                    <li><input type="radio" name="q8" value="R"> D. 鼠科</li>
-                </ul>
-            </div>
-            <div class="quiz-item">
-                <p>问题9: 哪种动物是变温动物?</p>
-                <ul>
-                   
-                    <li><input type="radio" name="q9" value="F"> A. 狗</li>
-                    <li><input type="radio" name="q9" value="R"> B. 蛇</li>
-                    <li><input type="radio" name="q9" value="F"> C. 人类</li>
-                    <li><input type="radio" name="q9" value="F"> D. 鲸鱼</li>
-                </ul>
-            </div>
-            <div class="quiz-item">
-                <p>问题10: 以下哪一项是昆虫的特征?</p>
-                <ul>
-                    <li><input type="radio" name="q10" value="F"> A. 八条腿</li>
-                    <li><input type="radio" name="q10" value="T"> B. 六条腿</li>
-                    <li><input type="radio" name="q10" value="F"> C. 生活在水中</li>
-                    <li><input type="radio" name="q10" value="F"> D. 有脊椎</li>
-                </ul>
-            </div>
-            <button type="button" id="submit-btn">提交答案</button>
-        </form>
+        <h2>動物分類測驗</h2>
+        <!-- 此處可加入具體的測驗問題和選項 -->
+        <div class="quiz-item">
+            <p>問題1: 哺乳動物通過什麼呼吸?</p>
+            <ul>
+                <li><input type="radio" name="q1" value="L"> 肺</li>
+                <li><input type="radio" name="q1" value="G"> 鰓</li>
+            </ul>
+        </div>
+        <!-- 可以加入更多的問題 -->
+        <button type="button" id="submit-btn">提交答案</button>
     </div>
     <footer>
-        <p>版权所有 © 生物学习平台</p>
+        <p>版權所有 © 生物學習平台</p>
     </footer>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
     <script>
-        let googleAuth;
-
-function initGoogleAuth() {
-    gapi.load('auth2', function() {
-        googleAuth = gapi.auth2.init({
-            client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'
-        });
-    });
-}
-
-document.getElementById('google-login-btn').addEventListener('click', function() {
-    if (googleAuth) {
-        googleAuth.signIn().then(function(googleUser) {
-            console.log("User signed in: ", googleUser.getBasicProfile().getName());
-        }).catch(function(error) {
-            console.error("Error signing in: ",
-            error);
-                });
-            }
-        });
-
-        document.getElementById('submit-btn').addEventListener('click', function() {
-            const form = document.getElementById('quiz-form');
-            const answers = ['C', 'G', 'W', 'T', 'T', 'M', 'B', 'C', 'R', 'T']; // 正确答案数组，需要根据实际问题填写
-            let totalQuestions = 10;
-            let correctAnswers = 0;
-
-            for (let i = 1; i <= totalQuestions; i++) {
-                const questionRadios = form['q' + i];
-                const questionBlock = document.querySelector('.quiz-item:nth-child(' + i + ')');
-
-                let answeredCorrectly = false;
-                for (let radio of questionRadios) {
-                    if (radio.checked) {
-                        if (radio.value === answers[i - 1]) {
-                            correctAnswers++;
-                            answeredCorrectly = true;
-                            break;
-                        }
-                    }
-                }
-
-                // 如果回答错误，显示正确答案
-                if (!answeredCorrectly) {
-                    for (let radio of questionRadios) {
-                        if (radio.value === answers[i - 1]) {
-                            const correctLabel = questionBlock.querySelector('label[for="' + radio.id + '"]');
-                            correctLabel.classList.add('correct-answer');
-                            break;
-                        }
-                    }
-                }
-            }
-
-            const score = correctAnswers * 10; // 每题10分
-            document.getElementById('score-display').textContent = `你的得分是: ${score}/100`;
-
-            // 防止多次提交
-            document.getElementById('submit-btn').disabled = true;
-        });
-
-        window.onload = function() {
-            initGoogleAuth();
+        // Initialize Firebase
+        var firebaseConfig = {
+            apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+            authDomain: "biologylearning-s11055013.firebaseapp.com",
+            projectId: "biologylearning-s11055013",
+            storageBucket: "biologylearning-s11055013.appspot.com",
+            messagingSenderId: "743496923725",
+            appId: "1:743496923725:web:866adef56bd80b02d53a04"
         };
+        firebase.initializeApp(firebaseConfig);
+
+        // Handle authentication state changes
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+                document.getElementById('logout-btn').style.display = 'inline';
+                document.getElementById('google-login-btn').style.display = 'none';
+            } else {
+                document.getElementById('user-info').textContent = '未登录';
+                document.getElementById('logout-btn').style.display = 'none';
+                document.getElementById('google-login-btn').style.display = 'inline';
+            }
+        });
+
+        // Sign in function
+        document.getElementById('google-login-btn').addEventListener('click', function() {
+            var provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider).catch(function(error) {
+                console.error('Sign in failed: ', error);
+            });
+        });
+
+        // Sign out function
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            firebase.auth().signOut().then(function() {
+                console.log('User signed out.');
+            }).catch(function(error) {
+                console.error('Sign out Error', error);
+            });
+        });
     </script>
 </body>
 </html>
-
-    </script>
-</body>
-</html>
-
