@@ -84,11 +84,22 @@
         #submit-btn {
             margin-top: 20px;
         }
+        .logo {
+            display: block;
+            margin: auto;
+            width: 80px;
+            animation: spin 20s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <header>
         <h1>生物學習平台</h1>
+        <img src="bernese.JPG" alt="學習平台Logo" class="logo">
     </header>
     <nav>
         <div id="user-info">未登录</div>
