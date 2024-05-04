@@ -22,17 +22,19 @@
         }
         nav {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
             background-color: #3b6978;
-            padding: 20px 0;
+            padding: 10px 20px;
         }
         nav ul {
             list-style-type: none;
             padding: 0;
+            display: flex;
+            margin: 0;
         }
         nav ul li {
-            display: inline;
-            margin-right: 10px;
+            margin-right: 20px;
         }
         nav ul li a {
             text-decoration: none;
@@ -49,6 +51,12 @@
         }
         button:hover {
             background-color: #cae8d5;
+        }
+        #user-info {
+            color: white;
+            font-weight: bold;
+            flex-grow: 1;
+            text-align: left;
         }
         .content {
             padding: 20px;
@@ -71,19 +79,17 @@
             margin: 0;
             font-size: 0.8rem;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
         .logo {
             display: block;
             margin: 10px auto;
             width: 80px;
             animation: spin 20s linear infinite;
         }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
 </head>
 <body>
     <header>
@@ -91,15 +97,15 @@
         <img src="bernese.JPG" alt="學習平台Logo" class="logo">
     </header>
     <nav>
-        <button id="google-login-btn">使用 Google 帳號登錄</button>
-        <button id="logout-btn" style="display: none;">登出</button>
-        <div id="user-info" style="color: white;"></div>
+        <div id="user-info">未登录</div>
         <ul>
             <li><a href="biologyhome.html">首頁</a></li>
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
             <li><a href="videos.html">教学视频</a></li>
         </ul>
+        <button id="google-login-btn">使用 Google 帳號登錄</button>
+        <button id="logout-btn" style="display: none;">登出</button>
     </nav>
     <div class="content">
         <h2>課程學習</h2>
@@ -111,55 +117,57 @@
             <h3>節肢動物的世界</h3>
             <p>探索節肢动物的多样性，包括昆虫、蛛形动物等。</p>
         </div>
-        <footer>
-            <p>版權所有 © 生物學習平台</p>
-        </footer>
-        <script>
-            // Your web app's Firebase configuration
-            var firebaseConfig = {
-                apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-                authDomain: "biologylearning-s11055013.firebaseapp.com",
-                databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
-                projectId: "biologylearning-s11055013",
-                storageBucket: "biologylearning-s11055013.appspot.com",
-                messagingSenderId: "743496923725",
-                appId: "1:743496923725:web:866adef56bd80b02d53a04"
-            };
-            // Initialize Firebase
-            firebase.initializeApp(firebaseConfig);
-    
-            // Handle authentication state changes
-            firebase.auth().onAuthStateChanged(function(user) {
-                if (user) {
-                    // User is signed in.
-                    document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
-                    document.getElementById('logout-btn').style.display = 'block';
-                    document.getElementById('google-login-btn').style.display = 'none';
-                } else {
-                    // No user is signed in.
-                    document.getElementById('user-info').innerHTML = '';
-                    document.getElementById('logout-btn').style.display = 'none';
-                    document.getElementById('google-login-btn').style.display = 'block';
-                }
+    </div>
+    <footer>
+        <p>版權所有 © 生物學習平台</p>
+    </footer>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+            authDomain: "biologylearning-s11055013.firebaseapp.com",
+            databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
+            projectId: "biologylearning-s11055013",
+            storageBucket: "biologylearning-s11055013.appspot.com",
+            messagingSenderId: "743496923725",
+            appId: "1:743496923725:web:866adef56bd80b02d53a04"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Handle authentication state changes
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                // User is signed in.
+                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+                document.getElementById('logout-btn').style.display = 'inline';
+                document.getElementById('google-login-btn').style.display = 'none';
+            } else {
+                // No user is signed in.
+                document.getElementById('user-info').textContent = '未登录';
+                document.getElementById('logout-btn').style.display = 'none';
+                document.getElementById('google-login-btn').style.display = 'inline';
+            }
+        });
+
+        // Sign in function
+        document.getElementById('google-login-btn').addEventListener('click', function() {
+            var provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider).catch(function(error) {
+                console.error('Sign in failed: ', error);
             });
-    
-            // Sign in function
-            document.getElementById('google-login-btn').addEventListener('click', function() {
-                var provider = new firebase.auth.GoogleAuthProvider();
-                firebase.auth().signInWithPopup(provider).catch(function(error) {
-                    console.error('Sign in failed: ', error);
-                });
+        });
+
+        // Sign out function
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            firebase.auth().signOut().then(function() {
+                console.log('User signed out.');
+            }).catch(function(error) {
+                console.error('Sign out Error', error);
             });
-    
-            // Sign out function
-            document.getElementById('logout-btn').addEventListener('click', function() {
-                firebase.auth().signOut().then(function() {
-                    console.log('User signed out.');
-                }).catch(function(error) {
-                    console.error('Sign out Error', error);
-                });
-            });
-        </script>
-    </body>
-    </html>
-    
+        });
+    </script>
+</body>
+</html>
