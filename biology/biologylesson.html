@@ -4,92 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>課程學習 - 生物學習平台</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-        header, footer {
-            background-color: #204051;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-        }
-        h1, h2 {
-            margin: 0;
-        }
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #3b6978;
-            padding: 10px 20px;
-        }
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-            display: flex;
-            margin: 0;
-        }
-        nav ul li {
-            margin-right: 20px;
-        }
-        nav ul li a {
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-        }
-        button {
-            padding: 10px 20px;
-            cursor: pointer;
-            background-color: #84a9ac;
-            border: none;
-            color: white;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: #cae8d5;
-        }
-        #user-info {
-            color: white;
-            font-weight: bold;
-            flex-grow: 1;
-            text-align: left;
-        }
-        .content {
-            padding: 20px;
-            text-align: center;
-        }
-        .course-item {
-            background-color: #ffffff;
-            margin: 10px auto;
-            padding: 20px;
-            width: 80%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .course-item h3 {
-            color: #204051;
-        }
-        .course-item p {
-            text-align: left;
-        }
-        footer p {
-            margin: 0;
-            font-size: 0.8rem;
-        }
-        .logo {
-            display: block;
-            margin: 10px auto;
-            width: 80px;
-            animation: spin 20s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+   <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+    }
+    header, footer {
+        background-color: #204051;
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+    }
+    h1, h2 {
+        margin: 0;
+    }
+    nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #3b6978;
+        padding: 10px 20px;
+    }
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+        display: flex;
+        margin: 0;
+    }
+    nav ul li {
+        margin-right: 20px; /* Ensures spacing between links is consistent */
+    }
+    nav ul li:last-child {
+        margin-right: 0; /* Removes extra margin from the last item */
+    }
+    nav ul li a {
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+    }
+    button {
+        padding: 10px 20px;
+        cursor: pointer;
+        background-color: #84a9ac;
+        border: none;
+        color: white;
+        border-radius: 5px;
+    }
+    button:hover {
+        background-color: #cae8d5;
+    }
+    #user-info {
+        color: white;
+        flex-grow: 1;
+        text-align: left;
+        padding-left: 20px;
+    }
+    .content {
+        padding: 20px;
+        text-align: center;
+    }
+    .course-item {
+        background-color: #ffffff;
+        margin: 10px auto;
+        padding: 20px;
+        width: 80%;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .course-item h3 {
+        color: #204051;
+    }
+    .course-item p {
+        text-align: left;
+    }
+    footer p {
+        margin: 0;
+        font-size: 0.8rem;
+    }
+    .featured-image {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .logo {
+        display: block;
+        margin: auto;
+        width: 80px;
+        animation: spin 20s linear infinite;
+    }
+</style>
+
 </head>
 <body>
     <header>
