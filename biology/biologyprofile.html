@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人信息 - 生物學習平台</title>
+   <style>
+    /* 全局样式 */
+body, h1, h2, p {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+header, footer {
+    background-color: #204051;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #3b6978;
+    padding: 10px 20px;
+}
+
+nav ul {
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    padding: 0;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav ul li:last-child {
+    margin-right: 0;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #84a9ac;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #cae8d5;
+}
+
+#user-info {
+    color: white;
+    font-weight: bold;
+    text-align: left;
+}
+
+.content {
+    padding: 20px;
+    text-align: center;
+}
+
+.course-item {
+    background-color: #ffffff;
+    margin: 10px auto;
+    padding: 20px;
+    width: 80%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.course-item h3 {
+    color: #204051;
+}
+
+.course-item p {
+    text-align: left;
+}
+
+footer p {
+    font-size: 0.8rem;
+    color: white;
+}
+
+.logo {
+    display: block;
+    margin: auto;
+    width: 80px;
+    animation: spin 20s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    <script src="firebase-config.js"></script> <!-- 引入 Firebase 配置 -->
+</head>
+<body>
+    <header>
+        <h1>生物學習平台</h1>
+    </header>
+    <nav>
+        <div id="user-info">未登录</div>
+        <ul>
+            <li><a href="biologyhome.html">首頁</a></li>
+            <li><a href="biologylesson.html">課程學習</a></li>
+            <li><a href="biologyquiz.html">測驗</a></li>
+            <li><a href="biologyvideos.html">教学视频</a></li>
+            <li><a href='biologyprofile.html'>個人檔案</a></li>
+        </ul>
+        <button id="logout-btn">登出</button>
+    </nav>
+    <div class="content">
+        <h2>個人信息</h2>
+        <div>
+            <p><strong>姓名：</strong><span id="display-name"></span></p>
+            <p><strong>電子郵件：</strong><span id="email"></span></p>
+        </div>
+    </div>
+    <footer>
+        <p>版權所有 © 生物學習平台</p>
+    </footer>
+    <script>
+        // Ensure Firebase is initialized
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    
+        // Authentication state observer and get user data
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                // User is signed in, update UI
+                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+                document.getElementById('display-name').textContent = user.displayName || 'No name specified';
+                document.getElementById('email').textContent = user.email || 'No email specified';
+            } else {
+                // User is not signed in, redirect to home page
+                window.location.href = 'biologyhome.html';
+            }
+        });
+    
+        // Sign out function
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            firebase.auth().signOut().then(function() {
+                console.log('User signed out.');
+                window.location.href = 'biologyhome.html';
+            }).catch(function(error) {
+                console.error('Sign out Error', error);
+            });
+        });
+    </script>
+    
+    
+</body>
+</html>
