@@ -100,7 +100,9 @@
     </footer>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    
     <script>
+        // Your web app's Firebase configuration
         var firebaseConfig = {
             apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
             authDomain: "biologylearning-s11055013.firebaseapp.com",
@@ -110,60 +112,64 @@
             messagingSenderId: "743496923725",
             appId: "1:743496923725:web:866adef56bd80b02d53a04"
         };
-        firebase
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-var provider = new firebase.auth.GoogleAuthProvider();
-
-firebase.auth().onAuthStateChanged(function(user) {
-    if (user) {
-        document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
-        document.getElementById('logout-btn').style.display = 'block';
-        document.getElementById('google-login-btn').style.display = 'none';
-    } else {
-        document.getElementById('user-info').innerHTML = '';
-        document.getElementById('logout-btn').style.display = 'none';
-        document.getElementById('google-login-btn').style.display = 'block';
-    }
-});
-
-function signInWithGoogle() {
-    firebase.auth().signInWithPopup(provider).then(function(result) {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        var token = result.credential.accessToken;
-        // The signed-in user info.
-        var user = result.user;
-        // ...
-    }).catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // The email of the user's account used.
-        var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential;
-        // ...
-    });
-}
-
-function signOut() {
-    firebase.auth().signOut().then(function() {
-        console.log('User signed out.');
-    }).catch(function(error) {
-        console.error('Sign out Error', error);
-    });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    var loginButton = document.getElementById('google-login-btn');
-    if (loginButton) {
-        loginButton.addEventListener('click', signInWithGoogle);
-    }
-    var logoutButton = document.getElementById('logout-btn');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', signOut);
-    }
-});
-</script>
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    
+        // Initialize Google Authentication provider
+        var provider = new firebase.auth.GoogleAuthProvider();
+    
+        // Handle authentication state changes
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                // User is signed in.
+                document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
+                document.getElementById('logout-btn').style.display = 'block';
+                document.getElementById('google-login-btn').style.display = 'none';
+            } else {
+                // No user is signed in.
+                document.getElementById('user-info').innerHTML = '';
+                document.getElementById('logout-btn').style.display = 'none';
+                document.getElementById('google-login-btn').style.display = 'block';
+            }
+        });
+    
+        // Sign in function
+        function signInWithGoogle() {
+            firebase.auth().signInWithPopup(provider).then(function(result) {
+                var token = result.credential.accessToken;
+                var user = result.user;
+                console.log('Signed in as: ' + user.displayName);
+            }).catch(function(error) {
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                console.error('Sign in failed: ', errorCode, errorMessage);
+            });
+        }
+    
+        // Sign out function
+        function signOut() {
+            firebase.auth().signOut().then(function() {
+                console.log('User signed out.');
+                document.getElementById('user-info').innerHTML = '';
+                document.getElementById('logout-btn').style.display = 'none';
+                document.getElementById('google-login-btn').style.display = 'block';
+            }).catch(function(error) {
+                console.error('Sign out Error', error);
+            });
+        }
+    
+        // Event listeners for button clicks
+        document.addEventListener('DOMContentLoaded', function() {
+            var loginButton = document.getElementById('google-login-btn');
+            if (loginButton) {
+                loginButton.addEventListener('click', signInWithGoogle);
+            }
+            var logoutButton = document.getElementById('logout-btn');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', signOut);
+            }
+        });
+    </script>
+    
 </body>
 </html>
