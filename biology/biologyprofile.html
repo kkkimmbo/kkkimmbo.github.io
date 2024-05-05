@@ -4,109 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>個人信息 - 生物學習平台</title>
-   <style>
-    /* 全局样式 */
-body, h1, h2, p {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-}
-
-header, footer {
-    background-color: #204051;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-}
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #3b6978;
-    padding: 10px 20px;
-}
-
-nav ul {
-    list-style-type: none;
-    display: flex;
-    align-items: center;
-    padding: 0;
-}
-
-nav ul li {
-    margin-right: 20px;
-}
-
-nav ul li:last-child {
-    margin-right: 0;
-}
-
-nav ul li a {
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
-}
-
-button {
-    padding: 10px 20px;
-    background-color: #84a9ac;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #cae8d5;
-}
-
-#user-info {
-    color: white;
-    font-weight: bold;
-    text-align: left;
-}
-
-.content {
-    padding: 20px;
-    text-align: center;
-}
-
-.course-item {
-    background-color: #ffffff;
-    margin: 10px auto;
-    padding: 20px;
-    width: 80%;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.course-item h3 {
-    color: #204051;
-}
-
-.course-item p {
-    text-align: left;
-}
-
-footer p {
-    font-size: 0.8rem;
-    color: white;
-}
-
-.logo {
-    display: block;
-    margin: auto;
-    width: 80px;
-    animation: spin 20s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-</style>
-    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    <style>
+        body, h1, h2, p {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        header, footer {
+            background-color: #204051;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #3b6978;
+            padding: 10px 20px;
+        }
+        nav ul {
+            list-style-type: none;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+        }
+        nav ul li {
+            margin-right: 20px;
+        }
+        nav ul li:last-child {
+            margin-right: 0;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #84a9ac;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #cae8d5;
+        }
+        #user-info {
+            color: white;
+            font-weight: bold;
+            text-align: left;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .course-item {
+            background-color: #ffffff;
+            margin: 10px auto;
+            padding: 20px;
+            width: 80%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .course-item h3 {
+            color: #204051;
+        }
+        .course-item p {
+            text-align: left;
+        }
+        footer p {
+            font-size: 0.8rem;
+            color: white;
+        }
+        .logo {
+            display: block;
+            margin: auto;
+            width: 80px;
+            animation: spin 20s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -133,56 +115,58 @@ footer p {
     <footer>
         <p>版權所有 © 生物學習平台</p>
     </footer>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
     <script>
-為了確保在登出後再次登入時可以選擇不同的帳號登入，需要在初始化 Google Authentication provider 時設置一個自定義的參數來要求每次登入都顯示帳號選擇界面。以下是你需要添加到你的 `<script>` 標籤中的代碼，這段代碼包括了初始化配置和修改後的登入功能：
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+            authDomain: "biologylearning-s11055013.firebaseapp.com",
+            databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
+            projectId: "biologylearning-s11055013",
+            storageBucket: "biologylearning-s11055013.appspot.com",
+            messagingSenderId: "743496923725",
+            appId: "1:743496923725:web:866adef56bd80b02d53a04"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
 
-javascript
-<script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
-<script>
-    // Your web app's Firebase configuration
-    var firebaseConfig = {
-        apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-        authDomain: "biologylearning-s11055013.firebaseapp.com",
-        databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
-        projectId: "biologylearning-s11055013",
-        storageBucket: "biologylearning-s11055013.appspot.com",
-        messagingSenderId: "743496923725",
-        appId: "1:743496923725:web:866adef56bd80b02d53a04"
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-
-    // Initialize Google Authentication provider
-    var provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({
-        prompt: 'select_account'
-    });
-
-    // Handle authentication state changes
-    firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-            document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
-            document.getElementById('logout-btn').style.display = 'block';
-            document.getElementById('login-btn').style.display = 'none';
-        } else {
-            document.getElementById('user-info').textContent = '未登录';
-            document.getElementById('logout-btn').style.display = 'none';
-            document.getElementById('login-btn').style.display = 'block';
-        }
-    });
-
-    // Sign in function
-    document.getElementById('login-btn').addEventListener('click', function() {
-        firebase.auth().signInWithPopup(provider).then(function(result) {
-            var token = result.credential.accessToken;
-            var user = result.user;
-            console.log('Signed in as: ' + user.displayName);
-        }).catch(function(error) {
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            console.error('Sign in failed: ', errorCode, errorMessage);
+        // Initialize Google Authentication provider
+        var provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({
+            prompt: 'select_account'
         });
-    });
 
-</script>
+        // Handle authentication state changes
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+                document.getElementById('display-name').textContent = user.displayName;
+                document.getElementById('email').textContent = user.email;
+                document.getElementById('logout-btn').style.display = 'block';
+                document.getElementById('login-btn').style.display = 'none';
+            } else {
+                document.getElementById('user-info').textContent = '未登录';
+                document.getElementById('logout-btn').style.display = 'none';
+                document.getElementById('login-btn').style.display = 'block';
+            }
+        });
+
+        // Sign in function
+        document.getElementById('login-btn').addEventListener('click', function() {
+            firebase.auth().signInWithPopup(provider).catch(function(error) {
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                console.error('Sign in failed: ', errorCode, errorMessage);
+            });
+        });
+
+        // Sign out function
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            firebase.auth().signOut().catch(function(error) {
+                console.error('Sign out Error', error);
+            });
+        });
+    </script>
+</body>
+</html>
