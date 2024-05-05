@@ -122,8 +122,6 @@ footer p {
             <li><a href="biologyvideos.html">教学视频</a></li>
             <li><a href='biologyprofile.html'>個人檔案</a></li>
         </ul>
-        <button id="login-btn">登入</button>
-        <button id="logout-btn">登出</button>
     </nav>
     <div class="content">
         <h2>個人信息</h2>
@@ -138,7 +136,7 @@ footer p {
     <script>
 為了確保在登出後再次登入時可以選擇不同的帳號登入，需要在初始化 Google Authentication provider 時設置一個自定義的參數來要求每次登入都顯示帳號選擇界面。以下是你需要添加到你的 `<script>` 標籤中的代碼，這段代碼包括了初始化配置和修改後的登入功能：
 
-```javascript
+javascript
 <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
 <script>
