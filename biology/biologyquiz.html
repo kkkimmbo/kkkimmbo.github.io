@@ -110,8 +110,6 @@
             <li><a href="biologyvideos.html">教學视频</a></li>
             <li><a href='biologyprofile.html'>個人檔案</a></li>
         </ul>
-        <button id="google-login-btn">使用 Google 帳號登錄</button>
-        <button id="logout-btn" style="display: none;">登出</button>
     </nav>
     <div class="content">
         <h2>動物分類測驗</h2>
@@ -155,60 +153,6 @@
                 document.getElementById('google-login-btn').style.display = 'inline';
             }
         });
-
-        // Sign in function
-        document.getElementById('google-login-btn').addEventListener('click', function() {
-            var provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider).catch(function(error) {
-                console.error('Sign in failed: ', error);
-            });
-        });
-
-        // Sign out function
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            firebase.auth().signOut().then(function() {
-                console.log('User signed out.');
-            }).catch(function(error) {
-                console.error('Sign out Error', error);
-            });
-        });
-        // Initialize Google Authentication provider
-var provider = new firebase.auth.GoogleAuthProvider();
-provider.setCustomParameters({
-    prompt: 'select_account'
-});
-
-// Sign in function
-function signInWithGoogle() {
-    firebase.auth().signInWithPopup(provider).then(function(result) {
-        var token = result.credential.accessToken;
-        var user = result.user;
-        console.log('Signed in as: ' + user.displayName);
-    }).catch(function(error) {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.error('Sign in failed: ', errorCode, errorMessage);
-    });
-}
-        // Initialize Google Authentication provider
-var provider = new firebase.auth.GoogleAuthProvider();
-provider.setCustomParameters({
-    prompt: 'select_account'
-});
-
-// Sign in function
-function signInWithGoogle() {
-    firebase.auth().signInWithPopup(provider).then(function(result) {
-        var token = result.credential.accessToken;
-        var user = result.user;
-        console.log('Signed in as: ' + user.displayName);
-    }).catch(function(error) {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.error('Sign in failed: ', errorCode, errorMessage);
-    });
-}
-
 
     </script>
 </body>
