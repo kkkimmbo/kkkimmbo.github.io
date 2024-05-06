@@ -164,13 +164,27 @@
 
         // 显示问题和选项
         function displayQuestion(question) {
-            const container = document.querySelector('.quiz-item');
-            container.innerHTML = `<h3>${question.questions}</h3><ul>`;
-            question.options.split(", ").forEach(option => {
-                container.innerHTML += `<li><button onclick="checkAnswer('${option}', '${question.answers}')">${option}</button></li>`;
-            });
-            container.innerHTML += '</ul>';
+    const container = document.querySelector('.quiz-item');
+    // 清空旧内容并添加问题标题
+    container.innerHTML = `<h3>${question.questions}</h3><ul>`;
+
+    // 为每个选项创建一个列表项和按钮
+    const options = [
+        question.options,  // 假设这是 options 字段的正确字段名
+        question.options2, // 假设这是 options2 字段的正确字段名
+        question.options3, // 假设这是 options3 字段的正确字段名
+        question.options4  // 假设这是 options4 字段的正确字段名
+    ];
+
+    options.forEach((option, index) => {
+        if (option) { // 确保选项存在
+            container.innerHTML += `<li><button onclick="checkAnswer('${option}', '${question.answers}')">${option}</button></li>`;
         }
+    });
+
+    container.innerHTML += '</ul>';
+}
+
 
         // 检查答案是否正确
         function checkAnswer(selected, correct) {
