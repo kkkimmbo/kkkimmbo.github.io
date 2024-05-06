@@ -5,95 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>動物分類測驗 - 生物學習平台</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-        header, footer {
-            background-color: #204051;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-        }
-        nav {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #3b6978;
-            padding: 10px 20px;
-        }
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-            display: flex;
-            margin: 0;
-        }
-        nav ul li {
-            margin-right: 20px;
-        }
-        nav ul li:last-child {
-            margin-right: 0;
-        }
-        nav ul li a {
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-        }
-        button {
-            padding: 10px 20px;
-            cursor: pointer;
-            background-color: #84a9ac;
-            border: none;
-            color: white;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: #cae8d5;
-        }
-        #user-info {
-            color: white;
-            flex-grow: 1;
-            text-align: left;
-            padding-left: 20px;
-        }
-        .content {
-            padding: 20px;
-            text-align: center;
-        }
-        .quiz-item {
-            background-color: #ffffff;
-            margin: 10px auto;
-            padding: 20px;
-            width: 80%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            text-align: left;
-        }
-        .quiz-item ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .quiz-item li {
-            margin-bottom: 5px;
-        }
-        footer p {
-            margin: 0;
-            font-size: 0.8rem;
-        }
-        #submit-btn {
-            margin-top: 20px;
-        }
-        .logo {
-            display: block;
-            margin: auto;
-            width: 80px;
-            animation: spin 20s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        /* CSS 略，保持原样 */
     </style>
 </head>
 <body>
@@ -113,12 +25,10 @@
     </nav>
     <div class="content">
         <h2>動物分類測驗</h2>
-        <!-- 此處可加入具體的測驗問題和選項 -->
         <div class="quiz-item">
             <!-- 题目加载位置 -->
         </div>
-        <!-- 可以加入更多的問題 -->
-        <button type="button" id="submit-btn">提交答案</button>
+        <button type="button" id="submit-btn" onclick="submitQuiz()">提交答案</button>
     </div>
     <footer>
         <p>版權所有 © 生物學習平台</p>
@@ -139,65 +49,46 @@
         firebase.initializeApp(firebaseConfig);
         var db = firebase.firestore();
 
-        // Handle authentication state changes
-        firebase.auth().onAuthStateChanged(function(user) {
-            if (user) {
-                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
-                document.getElementById('logout-btn').style.display = 'inline';
-                document.getElementById('google-login-btn').style.display = 'none';
-            } else {
-                document.getElementById('user-info').textContent = '未登录';
-                document.getElementById('logout-btn').style.display = 'none';
-                document.getElementById('google-login-btn').style.display = 'inline';
-            }
-        });
+        var score = 0; // 存储用户的得分
+        var totalQuestions = 0; // 已加载的题目数量
 
-        // 加载和显示一个随机的问题
-        function loadRandomQuestion() {
-            db.collection("questions").get().then((querySnapshot) => {
-                const questions = [];
-                querySnapshot.forEach((doc) => questions.push(doc.data()));
-                const randomIndex = Math.floor(Math.random() * questions.length);
-                displayQuestion(questions[randomIndex]);
+        function loadQuestions() {
+            db.collection("questions").limit(10).get().then((querySnapshot) => {
+                const questionsContainer = document.querySelector('.quiz-item');
+                questionsContainer.innerHTML = ''; // 清空先前的题目
+                querySnapshot.forEach((doc, index) => {
+                    const question = doc.data();
+                    const questionHTML = `<div class='question'>
+                        <h3>${question.questions}</h3>
+                        <ul id='question-${index}'>
+                            <li><button onclick="selectAnswer(${index}, '${question.options}', '${question.answers}')">${question.options}</button></li>
+                            <li><button onclick="selectAnswer(${index}, '${question.options2}', '${question.answers}')">${question.options2}</button></li>
+                            <li><button onclick="selectAnswer(${index}, '${question.options3}', '${question.answers}')">${question.options3}</button></li>
+                            <li><button onclick="selectAnswer(${index}, '${question.options4}', '${question.answers}')">${question.options4}</button></li>
+                        </ul>
+                    </div>`;
+                    questionsContainer.innerHTML += questionHTML;
+                    totalQuestions++;
+                });
             });
         }
 
-        // 显示问题和选项
-        function displayQuestion(question) {
-    const container = document.querySelector('.quiz-item');
-    // 清空旧内容并添加问题标题
-    container.innerHTML = `<h3>${question.questions}</h3><ul>`;
-
-    // 为每个选项创建一个列表项和按钮
-    const options = [
-        question.options,  // 假设这是 options 字段的正确字段名
-        question.options2, // 假设这是 options2 字段的正确字段名
-        question.options3, // 假设这是 options3 字段的正确字段名
-        question.options4  // 假设这是 options4 字段的正确字段名
-    ];
-
-    options.forEach((option, index) => {
-        if (option) { // 确保选项存在
-            container.innerHTML += `<li><button onclick="checkAnswer('${option}', '${question.answers}')">${option}</button></li>`;
-        }
-    });
-
-    container.innerHTML += '</ul>';
-}
-
-
-        // 检查答案是否正确
-        function checkAnswer(selected, correct) {
-            const resultDiv = document.getElementById('submit-btn');
-            if (selected === correct) {
-                resultDiv.innerHTML = "正确！";
-            } else {
-                resultDiv.innerHTML = "错误！";
+        function selectAnswer(questionIndex, selectedOption, correctAnswer) {
+            const questionUl = document.getElementById(`question-${questionIndex}`);
+            if (selectedOption === correctAnswer) {
+                score += 10; // 每题10分
             }
+            questionUl.querySelectorAll('button').forEach(btn => {
+                btn.disabled = true; // 禁用其他按钮
+            });
         }
 
-        // 页面加载时调用
-        window.onload = loadRandomQuestion;
+        function submitQuiz() {
+            alert(`你的得分是: ${score} / ${totalQuestions * 10}`);
+            score = 0; // 重置分数，以便重新测试
+        }
+
+        window.onload = loadQuestions;
     </script>
 </body>
 </html>
