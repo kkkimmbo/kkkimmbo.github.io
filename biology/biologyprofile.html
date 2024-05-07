@@ -110,6 +110,7 @@
         <div>
             <p><strong>姓名：</strong><span id="display-name"></span></p>
             <p><strong>電子郵件：</strong><span id="email"></span></p>
+            <p><strong>分數：</strong><span id="score"></span></p>
         </div>
     </div>
     <footer>
@@ -138,19 +139,35 @@
         });
 
         // Handle authentication state changes
-        firebase.auth().onAuthStateChanged(function(user) {
-            if (user) {
-                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
-                document.getElementById('display-name').textContent = user.displayName;
-                document.getElementById('email').textContent = user.email;
-                document.getElementById('logout-btn').style.display = 'block';
-                document.getElementById('login-btn').style.display = 'none';
+        // Handle authentication state changes
+firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+        document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+        document.getElementById('display-name').textContent = user.displayName;
+        document.getElementById('email').textContent = user.email;
+        // 获取并显示用户的分数
+        firebase.firestore().collection('users').doc(user.uid).get().then(function(doc) {
+            if (doc.exists) {
+                const userData = doc.data();
+                document.getElementById('score').textContent = userData.score || 'No score yet';
             } else {
-                document.getElementById('user-info').textContent = '未登录';
-                document.getElementById('logout-btn').style.display = 'none';
-                document.getElementById('login-btn').style.display = 'block';
+                document.getElementById('score').textContent = 'No score yet';
             }
+        }).catch(function(error) {
+            console.error("Error getting user data:", error);
         });
+        document.getElementById('logout-btn').style.display = 'block';
+        document.getElementById('login-btn').style.display = 'none';
+    } else {
+        document.getElementById('user-info').textContent = '未登录';
+        document.getElementById('logout-btn').style.display = 'none';
+        document.getElementById('login-btn').style.display = 'block';
+        document.getElementById('display-name').textContent = '';
+        document.getElementById('email').textContent = '';
+        document.getElementById('score').textContent = '';
+    }
+});
+
 
         // Sign in function
         document.getElementById('login-btn').addEventListener('click', function() {
