@@ -127,7 +127,7 @@
             document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
             document.getElementById('logout-btn').style.display = 'block';
             document.getElementById('google-login-btn').style.display = 'none';
-            saveUserData(user);  // Call function to save user data
+            saveUserData(user); // Save user data to Firestore
         } else {
             // No user is signed in.
             document.getElementById('user-info').innerHTML = '';
@@ -188,6 +188,7 @@
         }
     });
 </script>
+
 
     
 </body>
