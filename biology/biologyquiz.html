@@ -192,13 +192,33 @@ function submitQuiz() {
     Object.keys(answersRecord).forEach(index => {
         const answer = answersRecord[index];
         if (answer.selectedOption === answer.correctAnswer) {
-            score += 10;
+            score += 10; // 每个正确答案增加10分
         }
     });
-    alert(`你的得分是: ${score} / ${totalQuestions * 10}`);
+
+    alert(`你的得分是: ${score} / ${totalQuestions * 10}`); // 显示分数
+
+    // 检查用户是否登录，并保存分数到Firestore
+    const user = firebase.auth().currentUser;
+    if (user) {
+        firebase.firestore().collection('users').doc(user.uid).set({
+            score: score  // 更新用户的分数
+        }, { merge: true }) // 使用 merge 为 true，确保数据更新而不是替换
+        .then(() => {
+            console.log("Score updated successfully!");
+        })
+        .catch(error => {
+            console.error("Error updating score:", error);
+        });
+    } else {
+        console.log("No user signed in to save score.");
+    }
+
     score = 0; // 重置分数，以便重新测试
     loadQuestions(); // Optionally reload questions for a new quiz
 }
+
+
 firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
