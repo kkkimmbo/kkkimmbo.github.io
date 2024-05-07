@@ -92,8 +92,6 @@
         <img src="bernese.JPG" alt="學習平台Logo" class="logo">
     </header>
     <nav>
-        <button id="google-login-btn" style="display:inline;">使用 Google 帳號登錄</button>
-        <button id="logout-btn" style="display: none;">登出</button>
         <div id="user-info">未登录</div>
         <ul>
             <li><a href="biologyhome.html">首頁</a></li>
@@ -102,6 +100,7 @@
             <li><a href="biologyvideos.html">教學视频</a></li>
             <li><a href='biologyprofile.html'>個人檔案</a></li>
         </ul>
+   
     </nav>
     <div class="content">
         <h2>課程介紹</h2>
@@ -119,12 +118,11 @@
     </footer>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
     <script>
+        // Initialize Firebase
         var firebaseConfig = {
             apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
             authDomain: "biologylearning-s11055013.firebaseapp.com",
-            databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
             projectId: "biologylearning-s11055013",
             storageBucket: "biologylearning-s11055013.appspot.com",
             messagingSenderId: "743496923725",
@@ -132,42 +130,19 @@
         };
         firebase.initializeApp(firebaseConfig);
 
-        var provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('google-login-btn').addEventListener('click', function() {
-                firebase.auth().signInWithPopup(provider).then(function(result) {
-                    var user = result.user;
-                    console.log('Signed in as: ' + user.displayName + ' (' + user.email + ')');
-
-                    firebase.firestore().collection('users').doc(user.uid).set({
-                        username: user.displayName,
-                        useremail: user.email
-                    }, { merge: true }).then(function() {
-                        console.log('User information saved to Firestore');
-                    }).catch(function(error) {
-                        console.error('Error saving user information to Firestore: ', error);
-                    });
-
-                    document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
-                    document.getElementById('logout-btn').style.display = 'block';
-                    document.getElementById('google-login-btn').style.display = 'none';
-                }).catch(function(error) {
-                    console.error('Sign in failed: ', error.code, error.message);
-                });
-            });
-
-            document.getElementById('logout-btn').addEventListener('click', function() {
-                firebase.auth().signOut().then(function() {
-                    document.getElementById('user-info').innerHTML = '';
-                    document.getElementById('logout-btn').style.display = 'none;
-                    document.getElementById('google-login-btn').style.display = 'block';
-                }).catch(function(error) {
-                    console.error('Sign out Error', error);
-                });
-            });
+        // Handle authentication state changes
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+                document.getElementById('logout-btn').style.display = 'inline';
+                document.getElementById('google-login-btn').style.display = 'none';
+            } else {
+                document.getElementById('user-info').textContent = '未登录';
+                document.getElementById('logout-btn').style.display = 'none';
+                document.getElementById('google-login-btn').style.display = 'inline';
+            }
         });
+
     </script>
 </body>
 </html>
