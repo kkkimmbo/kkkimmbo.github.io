@@ -199,6 +199,17 @@ function submitQuiz() {
     score = 0; // 重置分数，以便重新测试
     loadQuestions(); // Optionally reload questions for a new quiz
 }
+firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+                document.getElementById('logout-btn').style.display = 'inline';
+                document.getElementById('google-login-btn').style.display = 'none';
+            } else {
+                document.getElementById('user-info').textContent = '未登录';
+                document.getElementById('logout-btn').style.display = 'none';
+                document.getElementById('google-login-btn').style.display = 'inline';
+            }
+        });
 
     </script>
 </body>
