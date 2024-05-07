@@ -2,7 +2,6 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="google-signin-client_id" content="130442278978-j29rl7r5srslikgar49cu0616e24icep.apps.googleusercontent.com">
     <title>生物学學習平台</title>
     <style>
         body {
@@ -63,15 +62,10 @@
             height: auto;
             display: block;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
         .logo {
             display: block;
             margin: 10px auto;
             width: 80px;
-            animation: spin 20s linear infinite;
         }
     </style>
 </head>
@@ -101,9 +95,8 @@
     </footer>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
     <script>
-        // Your web app's Firebase configuration
         var firebaseConfig = {
             apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
             authDomain: "biologylearning-s11055013.firebaseapp.com",
@@ -113,78 +106,44 @@
             messagingSenderId: "743496923725",
             appId: "1:743496923725:web:866adef56bd80b02d53a04"
         };
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
-        // Initialize Google Authentication provider
         var provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({
-            prompt: 'select_account'
-        });
+        provider.setCustomParameters({ prompt: 'select_account' });
 
-        // Handle authentication state changes
-        firebase.auth().onAuthStateChanged(function(user) {
-            if (user) {
-                // User is signed in.
-                document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
-                document.getElementById('logout-btn').style.display = 'block';
-                document.getElementById('google-login-btn').style.display = 'none';
-            } else {
-                // No user is signed in.
-                document.getElementById('user-info').innerHTML = '';
-                document.getElementById('logout-btn').style.display = 'none';
-                document.getElementById('google-login-btn').style.display = 'block';
-            }
-        });
-
-        // Sign in function
-        // Sign in function
-function signInWithGoogle() {
-    firebase.auth().signInWithPopup(provider).then(function(result) {
-        var token = result.credential.accessToken;
-        var user = result.user;
-        console.log('Signed in as: ' + user.displayName);
-
-        // Attempt to save user information to Firebase Database
-        var userRef = firebase.database().ref('users/' + user.uid);
-        userRef.set({
-            username: user.displayName,
-            useremail: user.email,
-            lastLoggedIn: new Date().toISOString()
-        }).then(() => {
-            console.log("User data saved successfully.");
-        }).catch((error) => {
-            console.error("Error saving user data:", error);
-        });
-    }).catch(function(error) {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.error('Sign in failed: ', errorCode, errorMessage);
-    });
-}
-
-        // Sign out function
-        function signOut() {
-            firebase.auth().signOut().then(function() {
-                console.log('User signed out.');
-                document.getElementById('user-info').innerHTML = '';
-                document.getElementById('logout-btn').style.display = 'none';
-                document.getElementById('google-login-btn').style.display = 'block';
-            }).catch(function(error) {
-                console.error('Sign out Error', error);
-            });
-        }
-
-        // Event listeners for button clicks
         document.addEventListener('DOMContentLoaded', function() {
-            var loginButton = document.getElementById('google-login-btn');
-            if (loginButton) {
-                loginButton.addEventListener('click', signInWithGoogle);
-            }
-            var logoutButton = document.getElementById('logout-btn');
-            if (logoutButton) {
-                logoutButton.addEventListener('click', signOut);
-            }
+            document.getElementById('google-login-btn').addEventListener('click', function() {
+                firebase.auth().signInWithPopup(provider).then(function(result) {
+                    var user = result.user;
+                    console.log('Signed in as: ' + user.displayName + ' (' + user.email + ')');
+
+                    firebase.firestore().collection('users').doc(user.uid).set({
+                        username: user.displayName,
+                        useremail: user.email
+                    }, { merge: true }).then(function() {
+                        console.log('User information saved to Firestore');
+                    }).catch(function(error) {
+                        console.error('Error saving user information to Firestore: ', error);
+                    });
+
+                    document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
+                    document.getElementById('logout-btn').style.display = 'block';
+                    document.getElementById('google-login-btn').style.display = 'none';
+                }).catch(function(error) {
+                    console.error('Sign in failed: ', error.code, error.message);
+                });
+            });
+
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                firebase.auth().signOut().then(function() {
+                    console.log('User signed out.');
+                    document.getElementById('user-info').innerHTML = '';
+                    document.getElementById('logout-btn').style.display = 'none';
+                    document.getElementById('google-login-btn').style.display = 'block';
+                }).catch(function(error) {
+                    console.error('Sign out Error', error);
+                });
+            });
         });
     </script>
 </body>
