@@ -145,6 +145,13 @@
                 });
             });
         });
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .catch(function(error) {
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    console.error("Persistence error:", errorCode, errorMessage);
+  });
+
     </script>
 </body>
 </html>
