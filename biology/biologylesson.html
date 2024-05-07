@@ -119,11 +119,12 @@
     </footer>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
     <script>
-        // Initialize Firebase
         var firebaseConfig = {
             apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
             authDomain: "biologylearning-s11055013.firebaseapp.com",
+            databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
             projectId: "biologylearning-s11055013",
             storageBucket: "biologylearning-s11055013.appspot.com",
             messagingSenderId: "743496923725",
@@ -131,18 +132,22 @@
         };
         firebase.initializeApp(firebaseConfig);
 
-        // Handle authentication state changes
-        firebase.auth().onAuthStateChanged(function(user) {
-            if (user) {
-                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
-                document.getElementById('logout-btn').style.display = 'inline';
-                document.getElementById('google-login-btn').style.display = 'none';
-            } else {
-                document.getElementById('user-info').textContent = '未登录';
-                document.getElementById('logout-btn').style.display = 'none';
-                document.getElementById('google-login-btn').style.display = 'inline';
-            }
-        });
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+          .then(function() {
+              firebase.auth().onAuthStateChanged(function(user) {
+                  if (user) {
+                      document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+                      document.getElementById('logout-btn').style.display = 'inline';
+                      document.getElementById('google-login-btn').style.display = 'none';
+                  } else {
+                      document.getElementById('user-info').textContent = '未登录';
+                      document.getElementById('logout-btn').style.display = 'none';
+                      document.getElementById('google-login-btn').style.display = 'inline';
+                  }
+              });
+          }).catch(function(error) {
+              console.error("Persistence setting error: ", error);
+          });
     </script>
 </body>
 </html>
