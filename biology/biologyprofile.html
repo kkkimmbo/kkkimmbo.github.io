@@ -118,6 +118,7 @@
     </footer>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
     <script>
         // Your web app's Firebase configuration
         var firebaseConfig = {
@@ -131,59 +132,35 @@
         };
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-
-        // Initialize Google Authentication provider
+    
         var provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({
             prompt: 'select_account'
         });
-
-        // Handle authentication state changes
-        // Handle authentication state changes
-firebase.auth().onAuthStateChanged(function(user) {
-    if (user) {
-        document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
-        document.getElementById('display-name').textContent = user.displayName;
-        document.getElementById('email').textContent = user.email;
-        // 获取并显示用户的分数
-        firebase.firestore().collection('users').doc(user.uid).get().then(function(doc) {
-            if (doc.exists) {
-                const userData = doc.data();
-                document.getElementById('score').textContent = userData.score || 'No score yet';
+    
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+                document.getElementById('display-name').textContent = user.displayName;
+                document.getElementById('email').textContent = user.email;
+                firebase.firestore().collection('users').doc(user.uid).get().then(function(doc) {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        document.getElementById('score').textContent = userData.score || 'No score yet';
+                    } else {
+                        document.getElementById('score').textContent = 'No score yet';
+                    }
+                }).catch(function(error) {
+                    console.error("Error getting user data:", error);
+                });
             } else {
-                document.getElementById('score').textContent = 'No score yet';
+                document.getElementById('user-info').textContent = '未登录';
+                document.getElementById('display-name').textContent = '';
+                document.getElementById('email').textContent = '';
+                document.getElementById('score').textContent = '';
             }
-        }).catch(function(error) {
-            console.error("Error getting user data:", error);
-        });
-        document.getElementById('logout-btn').style.display = 'block';
-        document.getElementById('login-btn').style.display = 'none';
-    } else {
-        document.getElementById('user-info').textContent = '未登录';
-        document.getElementById('logout-btn').style.display = 'none';
-        document.getElementById('login-btn').style.display = 'block';
-        document.getElementById('display-name').textContent = '';
-        document.getElementById('email').textContent = '';
-        document.getElementById('score').textContent = '';
-    }
-});
-
-
-        // Sign in function
-        document.getElementById('login-btn').addEventListener('click', function() {
-            firebase.auth().signInWithPopup(provider).catch(function(error) {
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                console.error('Sign in failed: ', errorCode, errorMessage);
-            });
-        });
-
-        // Sign out function
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            firebase.auth().signOut().catch(function(error) {
-                console.error('Sign out Error', error);
-            });
         });
     </script>
+    
 </body>
 </html>
