@@ -219,6 +219,14 @@ firebase.auth().onAuthStateChanged(function(user) {
                 document.getElementById('google-login-btn').style.display = 'inline';
             }
         });
+        function selectAnswer(questionIndex, selectedOption, correctAnswer, button) {
+    const questionUl = document.getElementById(`question-${questionIndex}`);
+    questionUl.querySelectorAll('button').forEach(btn => {
+        btn.classList.remove('selected-option'); // Remove selected class from all buttons
+    });
+    button.classList.add('selected-option'); // Add class to the selected button
+    answersRecord[questionIndex] = { selectedOption, correctAnswer };
+}
 
     </script>
 </body>
