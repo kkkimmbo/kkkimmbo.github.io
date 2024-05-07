@@ -101,9 +101,9 @@
     </footer>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
+
     <script>
-        // Your web app's Firebase configuration
         var firebaseConfig = {
             apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
             authDomain: "biologylearning-s11055013.firebaseapp.com",
@@ -113,81 +113,41 @@
             messagingSenderId: "743496923725",
             appId: "1:743496923725:web:866adef56bd80b02d53a04"
         };
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-    
-        // Initialize Google Authentication provider
         var provider = new firebase.auth.GoogleAuthProvider();
-    
-        // Handle authentication state changes
+
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
-                // User is signed in.
-                document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
+                console.log('Signed in as: ' + user.displayName);
+                console.log('Email: ' + user.email);
                 document.getElementById('logout-btn').style.display = 'block';
                 document.getElementById('google-login-btn').style.display = 'none';
             } else {
-                // No user is signed in.
-                document.getElementById('user-info').innerHTML = '';
                 document.getElementById('logout-btn').style.display = 'none';
                 document.getElementById('google-login-btn').style.display = 'block';
             }
         });
-    
-        // Sign in function
-        function signInWithGoogle() {
+
+        document.getElementById('google-login-btn').addEventListener('click', function() {
+            provider.setCustomParameters({
+                prompt: 'select_account'
+            });
             firebase.auth().signInWithPopup(provider).then(function(result) {
-                var token = result.credential.accessToken;
                 var user = result.user;
                 console.log('Signed in as: ' + user.displayName);
+                console.log('Email: ' + user.email);
             }).catch(function(error) {
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                console.error('Sign in failed: ', errorCode, errorMessage);
+                console.error('Sign in failed: ', error.code, error.message);
             });
-        }
-    
-        // Sign out function
-        function signOut() {
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', function() {
             firebase.auth().signOut().then(function() {
                 console.log('User signed out.');
-                document.getElementById('user-info').innerHTML = '';
-                document.getElementById('logout-btn').style.display = 'none';
-                document.getElementById('google-login-btn').style.display = 'block';
             }).catch(function(error) {
                 console.error('Sign out Error', error);
             });
-        }
-    
-        // Event listeners for button clicks
-        document.addEventListener('DOMContentLoaded', function() {
-            var loginButton = document.getElementById('google-login-btn');
-            if (loginButton) {
-                loginButton.addEventListener('click', signInWithGoogle);
-            }
-            var logoutButton = document.getElementById('logout-btn');
-            if (logoutButton) {
-                logoutButton.addEventListener('click', signOut);
-            }
         });
-        function signInWithGoogle() {
-    // 設定每次登入都能選擇帳號
-    provider.setCustomParameters({
-        prompt: 'select_account'
-    });
-
-    firebase.auth().signInWithPopup(provider).then(function(result) {
-        var token = result.credential.accessToken;
-        var user = result.user;
-        console.log('Signed in as: ' + user.displayName);
-    }).catch(function(error) {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.error('Sign in failed: ', errorCode, errorMessage);
-    });
-}
-
     </script>
-    
 </body>
 </html>
