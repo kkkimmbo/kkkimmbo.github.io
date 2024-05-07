@@ -150,18 +150,15 @@ window.onload = () => {
 };
 
 function loadQuestions() {
-    db.collection("questions").limit(30).get().then(querySnapshot => {
+    db.collection("questions").limit(10).get().then(querySnapshot => {
         let questions = [];
         querySnapshot.forEach(doc => {
             questions.push(doc.data());
         });
-        // 客戶端隨機排序
         questions.sort(() => Math.random() - 0.5);
-
-        // 只選擇前10個題目來顯示
         const questionsContainer = document.querySelector('.quiz-item');
         questionsContainer.innerHTML = '';
-        questions.slice(0, 10).forEach((question, index) => {
+        questions.forEach((question, index) => {
             const questionHTML = `<div class='question'>
                 <h3>${question.questions}</h3>
                 <ul id='question-${index}'>
@@ -172,19 +169,10 @@ function loadQuestions() {
             </div>`;
             questionsContainer.innerHTML += questionHTML;
         });
+        totalQuestions = questions.length; // 设置问题总数
     }).catch(error => {
-        console.error("加載題目時出錯: ", error);
+        console.error("加载题目时出错: ", error);
     });
-}
-
-
-function selectAnswer(questionIndex, selectedOption, correctAnswer, button) {
-    const questionUl = document.getElementById(`question-${questionIndex}`);
-    questionUl.querySelectorAll('button').forEach(btn => {
-        btn.classList.remove('selected-option'); // Remove selected class from all buttons
-    });
-    button.classList.add('selected-option'); // Add class to the selected button
-    answersRecord[questionIndex] = { selectedOption, correctAnswer };
 }
 
 function submitQuiz() {
@@ -192,31 +180,32 @@ function submitQuiz() {
     Object.keys(answersRecord).forEach(index => {
         const answer = answersRecord[index];
         if (answer.selectedOption === answer.correctAnswer) {
-            score += 10; // 每个正确答案增加10分
+            score += 10;
         }
     });
 
-    alert(`你的得分是: ${score} / ${totalQuestions * 10}`); // 显示分数
+    alert(`你的得分是: ${score} / ${totalQuestions * 10}`);
+    console.log(`Score calculated: ${score} out of ${totalQuestions * 10}`);
 
-    // 检查用户是否登录，并保存分数到Firestore
     const user = firebase.auth().currentUser;
     if (user) {
         firebase.firestore().collection('users').doc(user.uid).set({
-            score: score  // 更新用户的分数
-        }, { merge: true }) // 使用 merge 为 true，确保数据更新而不是替换
+            score: score
+        }, { merge: true })
         .then(() => {
-            console.log("Score updated successfully!");
+            console.log("Score updated successfully for user: " + user.uid);
         })
         .catch(error => {
-            console.error("Error updating score:", error);
+            console.error("Error updating score for user: " + user.uid, error);
         });
     } else {
         console.log("No user signed in to save score.");
     }
 
-    score = 0; // 重置分数，以便重新测试
+    score = 0; // Reset score for new quiz
     loadQuestions(); // Optionally reload questions for a new quiz
 }
+
 
 
 firebase.auth().onAuthStateChanged(function(user) {
