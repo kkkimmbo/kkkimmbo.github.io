@@ -140,26 +140,33 @@
         var score = 0; // 存储用户的得分
         var totalQuestions = 0; // 已加载的题目数量
 
-        function loadQuestions() {
-            db.collection("questions").limit(10).get().then((querySnapshot) => {
-                const questionsContainer = document.querySelector('.quiz-item');
-                questionsContainer.innerHTML = ''; // 清空先前的题目
-                querySnapshot.forEach((doc, index) => {
-                    const question = doc.data();
-                    const questionHTML = `<div class='question'>
-                        <h3>${question.questions}</h3>
-                        <ul id='question-${index}'>
-                            <li><button onclick="selectAnswer(${index}, '${question.options}', '${question.answers}')">${question.options}</button></li>
-                            <li><button onclick="selectAnswer(${index}, '${question.options2}', '${question.answers}')">${question.options2}</button></li>
-                            <li><button onclick="selectAnswer(${index}, '${question.options3}', '${question.answers}')">${question.options3}</button></li>
-                            <li><button onclick="selectAnswer(${index}, '${question.options4}', '${question.answers}')">${question.options4}</button></li>
-                        </ul>
-                    </div>`;
-                    questionsContainer.innerHTML += questionHTML;
-                    totalQuestions++;
-                });
+      function loadQuestions() {
+    // 從 firebase 隨機抽取問題
+    db.collection("questions")
+        .orderBy("random") // 依據 'random' 字段排序
+        .limit(10) // 限制結果數量為 10
+        .get()
+        .then((querySnapshot) => {
+            const questionsContainer = document.querySelector('.quiz-item');
+            questionsContainer.innerHTML = ''; // 清空以前的問題
+            querySnapshot.forEach((doc) => {
+                const question = doc.data();
+                const questionHTML = `<div class='question'>
+                    <h3>${question.question}</h3>
+                    <ul>
+                        ${question.options.map((option, index) => `
+                            <li><button onclick="selectAnswer(${doc.id}, '${option}', '${question.answer}')">${option}</button></li>
+                        `).join('')}
+                    </ul>
+                </div>`;
+                questionsContainer.innerHTML += questionHTML;
+                totalQuestions++;
             });
-        }
+        }).catch(error => {
+            console.error("Error loading questions: ", error);
+        });
+}
+
 
         function selectAnswer(questionIndex, selectedOption, correctAnswer) {
             const questionUl = document.getElementById(`question-${questionIndex}`);
