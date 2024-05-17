@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>動物分類測驗 - 生物學習平台</title>
     <style>
-      body {
+        body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -95,10 +95,9 @@
             100% { transform: rotate(360deg); }
         }
         .selected-option {
-    background-color: #cae8d5; /* 選中選項的背景顏色 */
-    color: white;
-}
-
+            background-color: #cae8d5; /* 選中選項的背景顏色 */
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -130,99 +129,87 @@
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
     <script>
- const firebaseConfig = {
-    apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-    authDomain: "biologylearning-s11055013.firebaseapp.com",
-    projectId: "biologylearning-s11055013",
-    storageBucket: "biologylearning-s11055013.appspot.com",
-    messagingSenderId: "743496923725",
-    appId: "1:743496923725:web:866adef56bd80b02d53a04"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+        const firebaseConfig = {
+            apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+            authDomain: "biologylearning-s11055013.firebaseapp.com",
+            projectId: "biologylearning-s11055013",
+            storageBucket: "biologylearning-s11055013.appspot.com",
+            messagingSenderId: "743496923725",
+            appId: "1:743496923725:web:866adef56bd80b02d53a04"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-var score = 0; // 存储用户的得分
-var totalQuestions = 0; // 已加载的题目数量
-var answersRecord = {};
+        var score = 0;
+        var totalQuestions = 0;
+        var answersRecord = {};
 
-window.onload = () => {
-    loadQuestions();
-};
+        window.onload = () => {
+            loadQuestions();
+        };
 
-function loadQuestions() {
-    db.collection("questions").limit(10).get().then(querySnapshot => {
-        let questions = [];
-        querySnapshot.forEach(doc => {
-            questions.push(doc.data());
-        });
-        questions.sort(() => Math.random() - 0.5);
-        const questionsContainer = document.querySelector('.quiz-item');
-        questionsContainer.innerHTML = '';
-        questions.forEach((question, index) => {
-            const questionHTML = `<div class='question'>
-                <h3>${question.questions}</h3>
-                <ul id='question-${index}'>
-                    ${['options', 'options2', 'options3', 'options4'].map(option => `
-                        <li><button onclick="selectAnswer(${index}, '${question[option]}', '${question.answers}', this)">${question[option]}</button></li>
-                    `).join('')}
-                </ul>
-            </div>`;
-            questionsContainer.innerHTML += questionHTML;
-        });
-        totalQuestions = questions.length; // 设置问题总数
-    }).catch(error => {
-        console.error("加载题目时出错: ", error);
-    });
-}
-
-function submitQuiz() {
-    score = 0;
-    let wrongQuestionsDetails = [];
-
-    Object.keys(answersRecord).forEach(index => {
-        const answer = answersRecord[index];
-        if (answer.selectedOption === answer.correctAnswer) {
-            score += 10; // 如果答案正确，增加分数
-        } else {
-            // 如果答案错误，记录题目和正确答案
-            wrongQuestionsDetails.push({ 
-                question: document.querySelector(`#question-${index} h3`).textContent,
-                selectedOption: answer.selectedOption, // 用户选择的答案
-                correctAnswer: answer.correctAnswer // 正确的答案
+        function loadQuestions() {
+            db.collection("questions").limit(10).get().then(querySnapshot => {
+                let questions = [];
+                querySnapshot.forEach(doc => {
+                    questions.push(doc.data());
+                });
+                questions.sort(() => Math.random() - 0.5);
+                const questionsContainer = document.querySelector('.quiz-item');
+                questionsContainer.innerHTML = '';
+                questions.forEach((question, index) => {
+                    const questionHTML = `<div class='question'>
+                        <h3>${question.questions}</h3>
+                        <ul id='question-${index}'>
+                            ${['options', 'options2', 'options3', 'options4'].map(option => `
+                                <li><button onclick="selectAnswer(${index}, '${question[option]}', '${question.answers}', this)">${question[option]}</button></li>
+                            `).join('')}
+                        </ul>
+                    </div>`;
+                    questionsContainer.innerHTML += questionHTML;
+                });
+                totalQuestions = questions.length;
+            }).catch(error => {
+                console.error("加载题目时出错: ", error);
             });
         }
-    });
 
-    // 在界面上显示得分
-    alert(`你的得分是: ${score} / ${totalQuestions * 10}`);
-    console.log(`Score calculated: ${score} out of ${totalQuestions * 10}`);
+        function submitQuiz() {
+            score = 0;
+            let wrongQuestionsDetails = [];
 
-    const user = firebase.auth().currentUser;
-    if (user) {
-        // 向Firebase数据库更新分数和错题详情
-        firebase.firestore().collection('users').doc(user.uid).set({
-            score: score,
-            wrongquestions: wrongQuestionsDetails  // 存储错误回答详情到正确的字段名
-        }, { merge: true })
-        .then(() => {
-            console.log("Score and wrong questions updated successfully for user: " + user.uid);
-        })
-        .catch(error => {
-            console.error("Error updating score and wrong questions for user: " + user.uid, error);
-        });
-    } else {
-        console.log("No user signed in to save score.");
-    }
+            Object.keys(answersRecord).forEach(index => {
+                const answer = answersRecord[index];
+                if (answer.selectedOption === answer.correctAnswer) {
+                    score += 10;
+                } else {
+                    wrongQuestionsDetails.push({
+                        question: document.querySelector(`#question-${index} h3`).textContent,
+                        selectedOption: answer.selectedOption,
+                        correctAnswer: answer.correctAnswer
+                    });
+                }
+            });
 
-    score = 0; // 重置分数为下一次测验准备
-    loadQuestions(); // 重新加载题目供下次测验
-}
+            alert(`你的得分是: ${score} / ${totalQuestions * 10}`);
+            console.log(`Score: ${score}, Wrong Answers: `, wrongQuestionsDetails);
 
+            const user = firebase.auth().currentUser;
+            if (user) {
+                firebase.firestore().collection('users').doc(user.uid).set({
+                    score: score,
+                    wrongquestions: wrongQuestionsDetails
+                }, { merge: true }).then(() => {
+                    console.log("Data updated successfully for user: " + user.uid);
+                }).catch(error => {
+                    console.error("Error updating data for user: " + user.uid, error);
+                });
+            } else {
+                console.log("No user signed in to save score and wrong answers.");
+            }
+        }
 
-
-
-
-firebase.auth().onAuthStateChanged(function(user) {
+        firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
                 document.getElementById('logout-btn').style.display = 'inline';
@@ -233,15 +220,15 @@ firebase.auth().onAuthStateChanged(function(user) {
                 document.getElementById('google-login-btn').style.display = 'inline';
             }
         });
-        function selectAnswer(questionIndex, selectedOption, correctAnswer, button) {
-    const questionUl = document.getElementById(`question-${questionIndex}`);
-    questionUl.querySelectorAll('button').forEach(btn => {
-        btn.classList.remove('selected-option'); // Remove selected class from all buttons
-    });
-    button.classList.add('selected-option'); // Add class to the selected button
-    answersRecord[questionIndex] = { selectedOption, correctAnswer };
-}
 
+        function selectAnswer(questionIndex, selectedOption, correctAnswer, button) {
+            const questionUl = document.getElementById(`question-${questionIndex}`);
+            questionUl.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove('selected-option');
+            });
+            button.classList.add('selected-option');
+            answersRecord[questionIndex] = { selectedOption, correctAnswer };
+        }
     </script>
 </body>
 </html>
