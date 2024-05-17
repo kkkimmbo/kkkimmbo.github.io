@@ -149,8 +149,9 @@
                         const userData = doc.data();
                         document.getElementById('score').textContent = userData.score || 'No score yet';
                         // New logic to display wrong answers
-                        const wrongAnswers = userData.wrongAnswers || [];
-                        document.getElementById('wrong-answers').textContent = wrongAnswers.join(", ") || 'No mistakes recorded';
+                        const wrongQuestions = userData.wrongquestions || [];
+                        const wrongQuestionsText = wrongQuestions.map(q => `題目 ${q.question}: 選擇 ${q.selectedOption}`).join(", ");
+                        document.getElementById('wrong-answers').textContent = wrongQuestionsText || 'No mistakes recorded';
                     } else {
                         document.getElementById('score').textContent = 'No score yet';
                         document.getElementById('wrong-answers').textContent = 'No mistakes recorded';
