@@ -185,7 +185,7 @@
                 if (answer.selectedOption === answer.correctAnswer) {
                     score += 10;
                 } else {
-                    wrongQuestions.push({ question: answer.questionText, selectedOption: answer.selectedOption });
+                    wrongQuestions.push({ question: answer.questionText, correctAnswer: answer.correctAnswer });
                 }
             });
 
