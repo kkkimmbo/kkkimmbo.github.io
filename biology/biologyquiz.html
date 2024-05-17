@@ -107,12 +107,12 @@
         <img src="bernese.JPG" alt="學習平台Logo" class="logo">
     </header>
     <nav>
-        <div id="user-info">未登錄</div>
+        <div id="user-info">未登录</div>
         <ul>
             <li><a href="biologyhome.html">首頁</a></li>
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
-            <li><a href="biologyvideos.html">教學影片</a></li>
+            <li><a href="biologyvideos.html">教學视频</a></li>
             <li><a href='biologyprofile.html'>個人檔案</a></li>
         </ul>
     </nav>
@@ -177,26 +177,38 @@ function loadQuestions() {
 
 function submitQuiz() {
     score = 0;
+    let wrongAnswersDetails = [];
+
     Object.keys(answersRecord).forEach(index => {
         const answer = answersRecord[index];
         if (answer.selectedOption === answer.correctAnswer) {
-            score += 10;
+            score += 10; // 如果答案正确，增加分数
+        } else {
+            // 如果答案错误，记录题目和正确答案
+            wrongAnswersDetails.push({ 
+                question: document.querySelector(`#question-${index} h3`).textContent,
+                selectedOption: answer.selectedOption, // 用户选择的答案
+                correctAnswer: answer.correctAnswer // 正确的答案
+            });
         }
     });
 
+    // 显示得分
     alert(`你的得分是: ${score} / ${totalQuestions * 10}`);
     console.log(`Score calculated: ${score} out of ${totalQuestions * 10}`);
 
     const user = firebase.auth().currentUser;
     if (user) {
+        // 向Firebase数据库更新分数和错题详情
         firebase.firestore().collection('users').doc(user.uid).set({
-            score: score
+            score: score,
+            wrongAnswers: wrongAnswersDetails  // 存储错误回答详情
         }, { merge: true })
         .then(() => {
-            console.log("Score updated successfully for user: " + user.uid);
+            console.log("Score and wrong answers updated successfully for user: " + user.uid);
         })
         .catch(error => {
-            console.error("Error updating score for user: " + user.uid, error);
+            console.error("Error updating score and wrong answers for user: " + user.uid, error);
         });
     } else {
         console.log("No user signed in to save score.");
@@ -205,6 +217,7 @@ function submitQuiz() {
     score = 0; // Reset score for new quiz
     loadQuestions(); // Optionally reload questions for a new quiz
 }
+
 
 
 
