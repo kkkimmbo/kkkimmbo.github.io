@@ -96,12 +96,12 @@
         <img src="bernese.JPG" alt="學習平台Logo" class="logo">
     </header>
     <nav>
-        <div id="user-info">未登錄</div>
+        <div id="user-info">未登录</div>
         <ul>
             <li><a href="biologyhome.html">首頁</a></li>
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
-            <li><a href="biologyvideos.html">教學影片</a></li>
+            <li><a href="biologyvideos.html">教学视频</a></li>
             <li><a href='biologyprofile.html'>個人檔案</a></li>
         </ul>
     </nav>
@@ -111,6 +111,7 @@
             <p><strong>姓名：</strong><span id="display-name"></span></p>
             <p><strong>電子郵件：</strong><span id="email"></span></p>
             <p><strong>分數：</strong><span id="score"></span></p>
+            <p><strong>答錯題目：</strong><span id="wrong-answers"></span></p>
         </div>
     </div>
     <footer>
@@ -147,8 +148,12 @@
                     if (doc.exists) {
                         const userData = doc.data();
                         document.getElementById('score').textContent = userData.score || 'No score yet';
+                        // New logic to display wrong answers
+                        const wrongAnswers = userData.wrongAnswers || [];
+                        document.getElementById('wrong-answers').textContent = wrongAnswers.join(", ") || 'No mistakes recorded';
                     } else {
                         document.getElementById('score').textContent = 'No score yet';
+                        document.getElementById('wrong-answers').textContent = 'No mistakes recorded';
                     }
                 }).catch(function(error) {
                     console.error("Error getting user data:", error);
@@ -158,6 +163,7 @@
                 document.getElementById('display-name').textContent = '';
                 document.getElementById('email').textContent = '';
                 document.getElementById('score').textContent = '';
+                document.getElementById('wrong-answers').textContent = '';
             }
         });
     </script>
