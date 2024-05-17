@@ -177,7 +177,7 @@ function loadQuestions() {
 
 function submitQuiz() {
     score = 0;
-    let wrongAnswersDetails = [];
+    let wrongQuestionsDetails = []; // 改为使用 Firestore 中的字段名
 
     Object.keys(answersRecord).forEach(index => {
         const answer = answersRecord[index];
@@ -185,7 +185,7 @@ function submitQuiz() {
             score += 10; // 如果答案正确，增加分数
         } else {
             // 如果答案错误，记录题目和正确答案
-            wrongAnswersDetails.push({ 
+            wrongQuestionsDetails.push({ 
                 question: document.querySelector(`#question-${index} h3`).textContent,
                 selectedOption: answer.selectedOption, // 用户选择的答案
                 correctAnswer: answer.correctAnswer // 正确的答案
@@ -202,13 +202,13 @@ function submitQuiz() {
         // 向Firebase数据库更新分数和错题详情
         firebase.firestore().collection('users').doc(user.uid).set({
             score: score,
-            wrongAnswers: wrongAnswersDetails  // 存储错误回答详情
+            wrongquestions: wrongQuestionsDetails  // 存储错误回答详情到正确的字段名
         }, { merge: true })
         .then(() => {
-            console.log("Score and wrong answers updated successfully for user: " + user.uid);
+            console.log("Score and wrong questions updated successfully for user: " + user.uid);
         })
         .catch(error => {
-            console.error("Error updating score and wrong answers for user: " + user.uid, error);
+            console.error("Error updating score and wrong questions for user: " + user.uid, error);
         });
     } else {
         console.log("No user signed in to save score.");
