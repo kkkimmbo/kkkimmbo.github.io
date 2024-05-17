@@ -177,7 +177,7 @@ function loadQuestions() {
 
 function submitQuiz() {
     score = 0;
-    let wrongQuestionsDetails = []; // 改为使用 Firestore 中的字段名
+    let wrongQuestionsDetails = [];
 
     Object.keys(answersRecord).forEach(index => {
         const answer = answersRecord[index];
@@ -193,7 +193,7 @@ function submitQuiz() {
         }
     });
 
-    // 显示得分
+    // 在界面上显示得分
     alert(`你的得分是: ${score} / ${totalQuestions * 10}`);
     console.log(`Score calculated: ${score} out of ${totalQuestions * 10}`);
 
@@ -214,9 +214,10 @@ function submitQuiz() {
         console.log("No user signed in to save score.");
     }
 
-    score = 0; // Reset score for new quiz
-    loadQuestions(); // Optionally reload questions for a new quiz
+    score = 0; // 重置分数为下一次测验准备
+    loadQuestions(); // 重新加载题目供下次测验
 }
+
 
 
 
