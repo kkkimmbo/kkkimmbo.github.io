@@ -140,8 +140,8 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        var score = 0;
-        var totalQuestions = 0;
+        var score = 0; // 存储用户的得分
+        var totalQuestions = 0; // 已加载的题目数量
         var answersRecord = {};
 
         window.onload = () => {
@@ -168,7 +168,7 @@
                     </div>`;
                     questionsContainer.innerHTML += questionHTML;
                 });
-                totalQuestions = questions.length;
+                totalQuestions = questions.length; // 设置问题总数
             }).catch(error => {
                 console.error("加载题目时出错: ", error);
             });
@@ -176,37 +176,37 @@
 
         function submitQuiz() {
             score = 0;
-            let wrongQuestionsDetails = [];
-
+            let wrongQuestions = [];
             Object.keys(answersRecord).forEach(index => {
                 const answer = answersRecord[index];
                 if (answer.selectedOption === answer.correctAnswer) {
                     score += 10;
                 } else {
-                    wrongQuestionsDetails.push({
-                        question: document.querySelector(`#question-${index} h3`).textContent,
-                        selectedOption: answer.selectedOption,
-                        correctAnswer: answer.correctAnswer
-                    });
+                    wrongQuestions.push({ question: index, selectedOption: answer.selectedOption });
                 }
             });
 
             alert(`你的得分是: ${score} / ${totalQuestions * 10}`);
-            console.log(`Score: ${score}, Wrong Answers: `, wrongQuestionsDetails);
+            console.log(`Score calculated: ${score} out of ${totalQuestions * 10}`);
 
             const user = firebase.auth().currentUser;
             if (user) {
-                firebase.firestore().collection('users').doc(user.uid).set({
+                db.collection('users').doc(user.uid).set({
                     score: score,
-                    wrongquestions: wrongQuestionsDetails
-                }, { merge: true }).then(() => {
-                    console.log("Data updated successfully for user: " + user.uid);
-                }).catch(error => {
-                    console.error("Error updating data for user: " + user.uid, error);
+                    wrongquestions: wrongQuestions
+                }, { merge: true })
+                .then(() => {
+                    console.log("Score and wrong questions updated successfully for user: " + user.uid);
+                })
+                .catch(error => {
+                    console.error("Error updating score and wrong questions for user: " + user.uid, error);
                 });
             } else {
-                console.log("No user signed in to save score and wrong answers.");
+                console.log("No user signed in to save score.");
             }
+
+            score = 0; // Reset score for new quiz
+            loadQuestions(); // Optionally reload questions for a new quiz
         }
 
         firebase.auth().onAuthStateChanged(function(user) {
@@ -224,9 +224,9 @@
         function selectAnswer(questionIndex, selectedOption, correctAnswer, button) {
             const questionUl = document.getElementById(`question-${questionIndex}`);
             questionUl.querySelectorAll('button').forEach(btn => {
-                btn.classList.remove('selected-option');
+                btn.classList.remove('selected-option'); // Remove selected class from all buttons
             });
-            button.classList.add('selected-option');
+            button.classList.add('selected-option'); // Add class to the selected button
             answersRecord[questionIndex] = { selectedOption, correctAnswer };
         }
     </script>
