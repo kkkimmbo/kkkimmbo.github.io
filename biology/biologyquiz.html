@@ -143,6 +143,7 @@
         var score = 0; // 存储用户的得分
         var totalQuestions = 0; // 已加载的题目数量
         var answersRecord = {};
+        var questionData = []; // 用于存储加载的题目信息
 
         window.onload = () => {
             loadQuestions();
@@ -152,9 +153,11 @@
             db.collection("questions").limit(10).get().then(querySnapshot => {
                 let questions = [];
                 querySnapshot.forEach(doc => {
-                    questions.push(doc.data());
+                    const data = doc.data();
+                    questions.push({ id: doc.id, ...data });
                 });
                 questions.sort(() => Math.random() - 0.5);
+                questionData = questions; // 保存问题数据
                 const questionsContainer = document.querySelector('.quiz-item');
                 questionsContainer.innerHTML = '';
                 questions.forEach((question, index) => {
@@ -162,7 +165,7 @@
                         <h3>${question.questions}</h3>
                         <ul id='question-${index}'>
                             ${['options', 'options2', 'options3', 'options4'].map(option => `
-                                <li><button onclick="selectAnswer(${index}, '${question[option]}', '${question.answers}', this)">${question[option]}</button></li>
+                                <li><button onclick="selectAnswer(${index}, '${question[option]}', '${question.answers}', '${question.questions}', this)">${question[option]}</button></li>
                             `).join('')}
                         </ul>
                     </div>`;
@@ -182,7 +185,7 @@
                 if (answer.selectedOption === answer.correctAnswer) {
                     score += 10;
                 } else {
-                    wrongQuestions.push({ question: index, selectedOption: answer.selectedOption });
+                    wrongQuestions.push({ question: answer.questionText, selectedOption: answer.selectedOption });
                 }
             });
 
@@ -221,13 +224,13 @@
             }
         });
 
-        function selectAnswer(questionIndex, selectedOption, correctAnswer, button) {
+        function selectAnswer(questionIndex, selectedOption, correctAnswer, questionText, button) {
             const questionUl = document.getElementById(`question-${questionIndex}`);
             questionUl.querySelectorAll('button').forEach(btn => {
                 btn.classList.remove('selected-option'); // Remove selected class from all buttons
             });
             button.classList.add('selected-option'); // Add class to the selected button
-            answersRecord[questionIndex] = { selectedOption, correctAnswer };
+            answersRecord[questionIndex] = { selectedOption, correctAnswer, questionText };
         }
     </script>
 </body>
