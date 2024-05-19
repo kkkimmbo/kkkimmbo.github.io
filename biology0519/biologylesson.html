@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="130442278978-j29rl7r5srslikgar49cu0616e24icep.apps.googleusercontent.com">
     <title>課程介紹 - 生物學習平台</title>
     <style>
         body {
@@ -229,12 +229,12 @@
                 if (valueFrom30414 > 80 && valueFrom30410 > 80) {
                     updateFirebaseLearningStatus('完成哺乳動物、節肢動物學習');
                     return '30670';
-                } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
-                    updateFirebaseLearningStatus('完成哺乳類動物學習');
-                    return '30595';
                 } else if (valueFrom30414 <= 80 && valueFrom30410 > 80) {
                     updateFirebaseLearningStatus('完成節肢動物學習');
                     return '30594';
+                } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
+                    updateFirebaseLearningStatus('完成哺乳類動物學習');
+                    return '30595';
                 } else {
                     updateFirebaseLearningStatus('未完成哺乳動物、節肢動物學習');
                     return Math.random() < 0.5 ? '30594' : '30595';
