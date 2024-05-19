@@ -71,16 +71,12 @@ function getNextStage() {
         valueFrom30414 = outputValue30414 + valueFrom30448 + valueFrom30599 + valueFrom30601 + valueFrom30447;
 
         if (valueFrom30414 > 80 && valueFrom30410 > 80) {
-            updateLearningProgress('完成哺乳動物、節肢動物學習');
             return '30670';
         } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
-            updateLearningProgress('完成哺乳類動物學習');
             return '30595';
         } else if (valueFrom30414 <= 80 && valueFrom30410 > 80) {
-            updateLearningProgress('完成節肢動物學習');
             return '30594';
         } else {
-            updateLearningProgress('未完成哺乳動物、節肢動物學習');
             return Math.random() < 0.5 ? '30594' : '30595';
         }
     } else if (currentProject === '30410') {
@@ -88,16 +84,12 @@ function getNextStage() {
         valueFrom30410 = outputValue30410 + valueFrom30603 + valueFrom30602 + valueFrom30443 + valueFrom30605;
 
         if (valueFrom30414 > 80 && valueFrom30410 > 80) {
-            updateLearningProgress('完成哺乳動物、節肢動物學習');
             return '30670';
         } else if (valueFrom30414 <= 80 && valueFrom30410 > 80) {
-            updateLearningProgress('完成節肢動物學習');
             return '30594';
         } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
-            updateLearningProgress('完成哺乳類動物學習');
             return '30595';
         } else {
-            updateLearningProgress('未完成哺乳動物、節肢動物學習');
             return Math.random() < 0.5 ? '30594' : '30595';
         }
     } else if (currentProject === '30670') {
@@ -127,11 +119,26 @@ function getNextStage() {
     return null;
 }
 
-function updateLearningProgress(progress) {
+function updateLearningProgress() {
     if (userId) {
+        let progress = '';
+        if (valueFrom30414 > 80 && valueFrom30410 > 80) {
+            progress = '完成哺乳動物、節肢動物學習';
+        } else if (valueFrom30414 > 80) {
+            progress = '完成哺乳類動物學習';
+        } else if (valueFrom30410 > 80) {
+            progress = '完成節肢動物學習';
+        } else {
+            progress = '未完成哺乳動物、節肢動物學習';
+        }
+
         firebase.firestore().collection('users').doc(userId).update({
             learning: progress
-        }, { merge: true });
+        }).then(() => {
+            console.log('Learning status updated successfully:', progress);
+        }).catch((error) => {
+            console.error('Error updating learning status:', error);
+        });
     }
 }
 
@@ -175,15 +182,7 @@ function checkAndSetNextProject() {
                         { id: '23a59353accf442694adb5ff024b3eb3', value: finalValue30605 }
                     ]);
                 } else if (currentProject === '30414') {
-                    if (valueFrom30414 > 80 && valueFrom30410 > 80) {
-                        updateLearningProgress('完成哺乳動物、節肢動物學習');
-                    } else if (valueFrom30414 > 80) {
-                        updateLearningProgress('完成哺乳類動物學習');
-                    } else if (valueFrom30410 > 80) {
-                        updateLearningProgress('完成節肢動物學習');
-                    } else {
-                        updateLearningProgress('未完成哺乳動物、節肢動物學習');
-                    }
+                    updateLearningProgress();
                 }
             }, 1000);
         }
