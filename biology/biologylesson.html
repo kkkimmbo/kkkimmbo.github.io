@@ -134,14 +134,13 @@
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 const userId = user.uid;
-                const displayName = user.displayName;
+                const displayName = user.displayName || 'Anonymous';
                 document.getElementById('user-info').textContent = 'Hello, ' + displayName;
                 document.getElementById('logout-btn').style.display = 'inline';
                 document.getElementById('google-login-btn').style.display = 'none';
 
-                // 发送用户信息到iframe
-                const iframe = document.getElementById('iframe_');
-                iframe.contentWindow.postMessage({
+                // 将用户信息传递给iframe
+                document.getElementById('iframe_').contentWindow.postMessage({
                     type: 'auth',
                     userId: userId,
                     displayName: displayName
