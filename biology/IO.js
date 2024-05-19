@@ -20,15 +20,13 @@ function setProject(projectId) {
 
     // 存储当前项目到 Firebase
     if (userId) {
-        firebase.firestore().collection('users').doc(userId).set({
+        firebase.firestore().collection('userProgress').doc(userId).set({
             currentProject: projectId
         }, { merge: true }).then(() => {
             console.log('Current project saved to Firestore');
         }).catch((error) => {
             console.error('Error saving current project:', error);
         });
-    } else {
-        console.error('No userId found when setting project');
     }
 }
 
@@ -45,8 +43,6 @@ function getNextStage() {
             return '30595';
         }
     } else if (currentProject === '30594') {
-        // 完成30594專案後更新firebase
-        updateMammalsVideoProgress();
         return '30448';
     } else if (currentProject === '30595') {
         return '30603';
@@ -129,24 +125,12 @@ function getNextStage() {
 
 function updateLearningProgress(progress) {
     if (userId) {
-        firebase.firestore().collection('users').doc(userId).set({
+        firebase.firestore().collection('userProgress').doc(userId).set({
             learning: progress
         }, { merge: true }).then(() => {
-            console.log('Learning progress updated successfully:', progress);
+            console.log('Learning status updated successfully');
         }).catch((error) => {
-            console.error('Error updating learning progress:', error);
-        });
-    }
-}
-
-function updateMammalsVideoProgress() {
-    if (userId) {
-        firebase.firestore().collection('users').doc(userId).set({
-            mammalsvideo: '已完成觀看哺乳類動物影片'
-        }, { merge: true }).then(() => {
-            console.log('Mammals video progress updated successfully');
-        }).catch((error) => {
-            console.error('Error updating mammals video progress:', error);
+            console.error('Error updating learning status:', error);
         });
     }
 }
@@ -214,29 +198,51 @@ setInterval(() => {
 setProject('30590'); // 初始化设置第一个项目
 
 // 初始化 Firebase
-var firebaseConfig = {
-    apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-    authDomain: "biologylearning-s11055013.firebaseapp.com",
-    projectId: "biologylearning-s11055013",
-    storageBucket: "biologylearning-s11055013.appspot.com",
-    messagingSenderId: "743496923725",
-    appId: "1:743496923725:web:866adef56bd80b02d53a04"
-};
-firebase.initializeApp(firebaseConfig);
+function initializeFirebase() {
+    var firebaseConfig = {
+        apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+        authDomain: "biologylearning-s11055013.firebaseapp.com",
+        projectId: "biologylearning-s11055013",
+        storageBucket: "biologylearning-s11055013.appspot.com",
+        messagingSenderId: "743496923725",
+        appId: "1:743496923725:web:866adef56bd80b02d53a04"
+    };
+    firebase.initializeApp(firebaseConfig);
+}
 
-// Handle authentication state changes
-firebase.auth().onAuthStateChanged(function(user) {
-    if (user) {
-        userId = user.uid;
-        console.log('User signed in:', userId); // 添加调试信息
-        document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
-        document.getElementById('logout-btn').style.display = 'inline';
-        document.getElementById('google-login-btn').style.display = 'none';
-    } else {
-        userId = null;
-        console.log('No user signed in'); // 添加调试信息
-        document.getElementById('user-info').textContent = '未登录';
-        document.getElementById('logout-btn').style.display = 'none';
-        document.getElementById('google-login-btn').style.display = 'block';
-    }
+// 確保Firebase SDK初始化
+document.addEventListener('DOMContentLoaded', function() {
+    initializeFirebase();
+
+    // 接收父頁面傳遞的訊息
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'auth') {
+            userId = event.data.userId;
+            const displayName = event.data.displayName;
+
+            console.log('Received user data:', userId, displayName);
+
+            // 现在可以在iframe中使用userId和displayName
+            // 示例：将用户ID保存到Firebase
+            firebase.firestore().collection('users').doc(userId).set({
+                userId: userId,
+                displayName: displayName,
+                mammalsvideo: '已完成觀看哺乳類動物影片'
+            }, { merge: true }).then(() => {
+                console.log('Mammals video progress updated successfully');
+            }).catch((error) => {
+                console.error('Error updating mammals video progress:', error);
+            });
+        }
+    });
+
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            userId = user.uid;
+            console.log('User signed in:', userId);
+        } else {
+            console.log('No user signed in');
+        }
+    });
 });
+</script>
