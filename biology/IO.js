@@ -126,7 +126,7 @@ function getNextStage() {
 }
 
 function updateLearningProgress() {
-    if (userId) {
+    if (user.uid) {
         let progress = '';
         if (valueFrom30414 > 80 && valueFrom30410 > 80) {
             progress = '完成哺乳動物、節肢動物學習';
