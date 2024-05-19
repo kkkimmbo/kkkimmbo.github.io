@@ -161,18 +161,33 @@ function checkAndSetNextProject() {
                 if (currentProject === '30594') {
                     sendMessageToParent({
                         type: 'updateFirebaseStatus',
-                        status: '已完成哺乳動物影片觀看',
+                        status: '已完成哺乳類動物影片觀看',
                         field: 'mammalsvideo'
                     });
-                } else if (currentProject === '30595') {
+                } else {
                     sendMessageToParent({
                         type: 'updateFirebaseStatus',
-                        status: '已完成節肢動物影片觀看',
+                        status: '未完成哺乳類動物影片觀看',
+                        field: 'mammalsvideo'
+                    });
+                }
+
+                if (currentProject === '30595') {
+                    sendMessageToParent({
+                        type: 'updateFirebaseStatus',
+                        status: '已完成節肢類動物影片觀看',
                         field: 'arthropodsvideo'
                     });
-                } else if (currentProject === '30414') {
-                    const outputValue30414 = parseInt(diveLinker.getAttr('5f7d12ea2145450eab69b9b79630d03c'));
-                    const learningStatus = getLearningStatus(outputValue30414, valueFrom30410);
+                } else {
+                    sendMessageToParent({
+                        type: 'updateFirebaseStatus',
+                        status: '未完成節肢類動物影片觀看',
+                        field: 'arthropodsvideo'
+                    });
+                }
+
+                if (currentProject === '30414' || currentProject === '30410') {
+                    const learningStatus = getLearningStatus(valueFrom30414, valueFrom30410);
                     sendMessageToParent({
                         type: 'updateFirebaseStatus',
                         status: learningStatus,
@@ -186,13 +201,13 @@ function checkAndSetNextProject() {
 
 function getLearningStatus(value30414, value30410) {
     if (value30414 > 80 && value30410 > 80) {
-        return '完成哺乳動物、節肢動物學習';
+        return '完成哺乳動物、節肢動物測驗';
     } else if (value30414 > 80 && value30410 <= 80) {
-        return '完成哺乳類動物學習';
+        return '僅完成哺乳類動物測驗';
     } else if (value30414 <= 80 && value30410 > 80) {
-        return '完成節肢動物學習';
+        return '僅完成節肢動物類測驗';
     } else {
-        return '未完成哺乳動物、節肢動物學習';
+        return '未完成哺乳動物、節肢動物測驗';
     }
 }
 
