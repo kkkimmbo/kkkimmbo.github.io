@@ -45,6 +45,8 @@ function getNextStage() {
             return '30595';
         }
     } else if (currentProject === '30594') {
+        // 完成30594專案後更新firebase
+        updateMammalsVideoProgress();
         return '30448';
     } else if (currentProject === '30595') {
         return '30603';
@@ -125,29 +127,27 @@ function getNextStage() {
     return null;
 }
 
-function updateLearningProgress() {
+function updateLearningProgress(progress) {
     if (userId) {
-        let progress = '';
-        if (valueFrom30414 > 80 && valueFrom30410 > 80) {
-            progress = '完成哺乳動物、節肢動物學習';
-        } else if (valueFrom30414 > 80) {
-            progress = '完成哺乳類動物學習';
-        } else if (valueFrom30410 > 80) {
-            progress = '完成節肢動物學習';
-        } else {
-            progress = '未完成哺乳動物、節肢動物學習';
-        }
-
-        console.log('Updating learning progress:', progress); // 添加调试信息
-        firebase.firestore().collection('users').doc(userId).update({
+        firebase.firestore().collection('users').doc(userId).set({
             learning: progress
-        }).then(() => {
-            console.log('Learning status updated successfully:', progress);
+        }, { merge: true }).then(() => {
+            console.log('Learning progress updated successfully:', progress);
         }).catch((error) => {
-            console.error('Error updating learning status:', error);
+            console.error('Error updating learning progress:', error);
         });
-    } else {
-        console.error('No userId found when updating learning progress');
+    }
+}
+
+function updateMammalsVideoProgress() {
+    if (userId) {
+        firebase.firestore().collection('users').doc(userId).set({
+            mammalsvideo: '已完成觀看哺乳類動物影片'
+        }, { merge: true }).then(() => {
+            console.log('Mammals video progress updated successfully');
+        }).catch((error) => {
+            console.error('Error updating mammals video progress:', error);
+        });
     }
 }
 
@@ -191,7 +191,15 @@ function checkAndSetNextProject() {
                         { id: '23a59353accf442694adb5ff024b3eb3', value: finalValue30605 }
                     ]);
                 } else if (currentProject === '30414') {
-                    updateLearningProgress();
+                    if (valueFrom30414 > 80 && valueFrom30410 > 80) {
+                        updateLearningProgress('完成哺乳動物、節肢動物學習');
+                    } else if (valueFrom30414 > 80) {
+                        updateLearningProgress('完成哺乳類動物學習');
+                    } else if (valueFrom30410 > 80) {
+                        updateLearningProgress('完成節肢動物學習');
+                    } else {
+                        updateLearningProgress('未完成哺乳動物、節肢動物學習');
+                    }
                 }
             }, 1000);
         }
