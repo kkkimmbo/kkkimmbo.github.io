@@ -161,11 +161,38 @@ function checkAndSetNextProject() {
                 if (currentProject === '30594') {
                     sendMessageToParent({
                         type: 'updateFirebaseStatus',
-                        status: '已完成'
+                        status: '已完成哺乳動物影片觀看',
+                        field: 'mammalsvideo'
+                    });
+                } else if (currentProject === '30595') {
+                    sendMessageToParent({
+                        type: 'updateFirebaseStatus',
+                        status: '已完成節肢動物影片觀看',
+                        field: 'arthropodsvideo'
+                    });
+                } else if (currentProject === '30414') {
+                    const outputValue30414 = parseInt(diveLinker.getAttr('5f7d12ea2145450eab69b9b79630d03c'));
+                    const learningStatus = getLearningStatus(outputValue30414, valueFrom30410);
+                    sendMessageToParent({
+                        type: 'updateFirebaseStatus',
+                        status: learningStatus,
+                        field: 'learning'
                     });
                 }
             }, 1000);
         }
+    }
+}
+
+function getLearningStatus(value30414, value30410) {
+    if (value30414 > 80 && value30410 > 80) {
+        return '完成哺乳動物、節肢動物學習';
+    } else if (value30414 > 80 && value30410 <= 80) {
+        return '完成哺乳類動物學習';
+    } else if (value30414 <= 80 && value30410 > 80) {
+        return '完成節肢動物學習';
+    } else {
+        return '未完成哺乳動物、節肢動物學習';
     }
 }
 
