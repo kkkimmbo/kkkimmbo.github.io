@@ -1,14 +1,3 @@
-// 初始化 Firebase
-var firebaseConfig = {
-    apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-    authDomain: "biologylearning-s11055013.firebaseapp.com",
-    projectId: "biologylearning-s11055013",
-    storageBucket: "biologylearning-s11055013.appspot.com",
-    messagingSenderId: "743496923725",
-    appId: "1:743496923725:web:866adef56bd80b02d53a04"
-};
-firebase.initializeApp(firebaseConfig);
-
 const diveLinker = new DiveLinker('dive1');
 
 let currentProject = '30590';
@@ -29,17 +18,10 @@ function setProject(projectId) {
     currentProject = projectId;
     console.log(`Set project to ${projectId}`);
 
-    // 除了30590，其余项目关闭浮水印
-    if (projectId !== '30590') {
-        diveLinker.enableBlock(false);
-        diveLinker.start();
-    }
-
-    // 保存用户学习进度
+    // 存储当前项目到 Firebase
     if (userId) {
         firebase.firestore().collection('userProgress').doc(userId).set({
-            currentProject: projectId,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            currentProject: projectId
         }, { merge: true });
     }
 }
@@ -89,20 +71,12 @@ function getNextStage() {
         valueFrom30414 = outputValue30414 + valueFrom30448 + valueFrom30599 + valueFrom30601 + valueFrom30447;
 
         if (valueFrom30414 > 80 && valueFrom30410 > 80) {
-            // 更新学习进度
-            updateLearningProgress('完成哺乳動物、節肢動物學習');
             return '30670';
         } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
-            // 更新学习进度
-            updateLearningProgress('完成哺乳類動物學習');
             return '30595';
         } else if (valueFrom30414 <= 80 && valueFrom30410 > 80) {
-            // 更新学习进度
-            updateLearningProgress('完成節肢動物學習');
             return '30594';
         } else {
-            // 更新学习进度
-            updateLearningProgress('未完成哺乳動物、節肢動物學習');
             return Math.random() < 0.5 ? '30594' : '30595';
         }
     } else if (currentProject === '30410') {
@@ -110,20 +84,12 @@ function getNextStage() {
         valueFrom30410 = outputValue30410 + valueFrom30603 + valueFrom30602 + valueFrom30443 + valueFrom30605;
 
         if (valueFrom30414 > 80 && valueFrom30410 > 80) {
-            // 更新学习进度
-            updateLearningProgress('完成哺乳動物、節肢動物學習');
             return '30670';
         } else if (valueFrom30414 <= 80 && valueFrom30410 > 80) {
-            // 更新学习进度
-            updateLearningProgress('完成節肢動物學習');
             return '30594';
         } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
-            // 更新学习进度
-            updateLearningProgress('完成哺乳類動物學習');
             return '30595';
         } else {
-            // 更新学习进度
-            updateLearningProgress('未完成哺乳動物、節肢動物學習');
             return Math.random() < 0.5 ? '30594' : '30595';
         }
     } else if (currentProject === '30670') {
@@ -153,11 +119,10 @@ function getNextStage() {
     return null;
 }
 
-function updateLearningProgress(status) {
+function updateLearningProgress(progress) {
     if (userId) {
         firebase.firestore().collection('userProgress').doc(userId).set({
-            learning: status,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            learning: progress
         }, { merge: true });
     }
 }
@@ -201,49 +166,51 @@ function checkAndSetNextProject() {
                         { id: '90899e0eef064729b27f41a1728eaa35', value: valueFrom30443 },
                         { id: '23a59353accf442694adb5ff024b3eb3', value: finalValue30605 }
                     ]);
+                } else if (currentProject === '30414') {
+                    if (valueFrom30414 > 80 && valueFrom30410 > 80) {
+                        updateLearningProgress('完成哺乳動物、節肢動物學習');
+                    } else if (valueFrom30414 > 80) {
+                        updateLearningProgress('完成哺乳類動物學習');
+                    } else if (valueFrom30410 > 80) {
+                        updateLearningProgress('完成節肢動物學習');
+                    } else {
+                        updateLearningProgress('未完成哺乳動物、節肢動物學習');
+                    }
                 }
             }, 1000);
         }
     }
 }
 
-// 处理用户登录状态变化
+// 定时检查项目完成状态并处理跳转逻辑
+setInterval(() => {
+    checkAndSetNextProject();
+}, 1000);
+
+setProject('30590'); // 初始化设置第一个项目
+
+// 初始化 Firebase
+var firebaseConfig = {
+    apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+    authDomain: "biologylearning-s11055013.firebaseapp.com",
+    projectId: "biologylearning-s11055013",
+    storageBucket: "biologylearning-s11055013.appspot.com",
+    messagingSenderId: "743496923725",
+    appId: "1:743496923725:web:866adef56bd80b02d53a04"
+};
+firebase.initializeApp(firebaseConfig);
+
+// 处理身份验证状态变化
 firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
         userId = user.uid;
         document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
-
-        // 加载用户的学习进度
-        firebase.firestore().collection('userProgress').doc(userId).get().then(doc => {
-            if (doc.exists) {
-                const data = doc.data();
-                if (data && data.currentProject) {
-                    setProject(data.currentProject);
-                } else {
-                    setProject('30590'); // 初始设置第一个项目
-                }
-            } else {
-                setProject('30590'); // 初始设置第一个项目
-            }
-        });
+        document.getElementById('logout-btn').style.display = 'inline';
+        document.getElementById('google-login-btn').style.display = 'none';
     } else {
         userId = null;
         document.getElementById('user-info').textContent = '未登录';
+        document.getElementById('logout-btn').style.display = 'none';
+        document.getElementById('google-login-btn').style.display = 'inline';
     }
 });
-
-// 页面加载时初始化第一个项目并显示浮水印
-window.onload = function () {
-    if (!userId) {
-        diveLinker.enableBlock(true); // 显示浮水印
-        setProject('30590'); // 初始化设置第一个项目
-        diveLinker.start(); // 启动项目
-    }
-};
-
-// 定时检查项目完成状态并处理跳转逻辑
-setInterval(() => {
-    if (userId) {
-        checkAndSetNextProject();
-    }
-}, 1000);
