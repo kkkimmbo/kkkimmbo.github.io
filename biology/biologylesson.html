@@ -149,7 +149,7 @@
         window.addEventListener('message', function(event) {
             console.log("Received message from iframe:", event.data);
             // 接受來自信任來源的消息
-            const trustedOrigins = ['https://dive.nutn.edu.tw', 'https://kkkimmbo.github.io'];
+            const trustedOrigins = ['https://dive.nutn.edu.tw', 'https://kkkimbo.github.io'];
             if (!trustedOrigins.includes(event.origin)) {
                 console.log("Ignoring message from unknown origin:", event.origin);
                 return; // 忽略來自其他來源的消息
@@ -159,21 +159,21 @@
                 const user = firebase.auth().currentUser;
                 if (user) {
                     console.log("Updating Firebase status for user:", user.uid);
-                    updateFirebaseStatus(user.uid, data.status);
+                    updateFirebaseStatus(user.uid, data.field, data.status);
                 } else {
                     console.error("User not authenticated. Cannot update Firebase status.");
                 }
             }
         }, false);
 
-        function updateFirebaseStatus(userId, status) {
-            console.log(`Updating Firebase status for userId: ${userId}, status: ${status}`);
-            db.collection("users").doc(userId).set({
-                mammalsvideo: status
-            }, { merge: true })
+        function updateFirebaseStatus(userId, field, status) {
+            console.log(`Updating Firebase status for userId: ${userId}, field: ${field}, status: ${status}`);
+            const updateData = {};
+            updateData[field] = status;
+            db.collection("users").doc(userId).set(updateData, { merge: true })
             .then(() => {
                 console.log("Document successfully written!");
-                document.getElementById('user-info').textContent = '已完成哺乳動物影片觀看';
+                document.getElementById('user-info').textContent = status;
             })
             .catch((error) => {
                 console.error("Error writing document: ", error);
