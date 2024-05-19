@@ -136,6 +136,9 @@
                 document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
                 document.getElementById('logout-btn').style.display = 'inline';
                 document.getElementById('google-login-btn').style.display = 'none';
+
+                // Pass the user object to the IO.js file
+                window.localStorage.setItem('firebaseUser', JSON.stringify(user));
             } else {
                 document.getElementById('user-info').textContent = '未登录';
                 
@@ -144,5 +147,3 @@
     </script>
 </body>
 </html>
-
-
