@@ -190,27 +190,25 @@ setInterval(() => {
 setProject('30590'); // 初始化设置第一个项目
 
 // 初始化 Firebase
-var firebaseConfig = {
-    apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-    authDomain: "biologylearning-s11055013.firebaseapp.com",
-    projectId: "biologylearning-s11055013",
-    storageBucket: "biologylearning-s11055013.appspot.com",
-    messagingSenderId: "743496923725",
-    appId: "1:743496923725:web:866adef56bd80b02d53a04"
-};
-firebase.initializeApp(firebaseConfig);
+  // Initialize Firebase
+        var firebaseConfig = {
+            apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+            authDomain: "biologylearning-s11055013.firebaseapp.com",
+            projectId: "biologylearning-s11055013",
+            storageBucket: "biologylearning-s11055013.appspot.com",
+            messagingSenderId: "743496923725",
+            appId: "1:743496923725:web:866adef56bd80b02d53a04"
+        };
+        firebase.initializeApp(firebaseConfig);
 
-// 处理身份验证状态变化
-firebase.auth().onAuthStateChanged(function (user) {
-    if (user) {
-        userId = user.uid;
-        document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
-        document.getElementById('logout-btn').style.display = 'inline';
-        document.getElementById('google-login-btn').style.display = 'none';
-    } else {
-        userId = null;
-        document.getElementById('user-info').textContent = '未登录';
-        document.getElementById('logout-btn').style.display = 'none';
-        document.getElementById('google-login-btn').style.display = 'inline';
-    }
-});
+        // Handle authentication state changes
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+                document.getElementById('logout-btn').style.display = 'inline';
+                document.getElementById('google-login-btn').style.display = 'none';
+            } else {
+                document.getElementById('user-info').textContent = '未登录';
+                
+            }
+        });
