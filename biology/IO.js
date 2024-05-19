@@ -139,7 +139,7 @@ function updateLearningProgress() {
         }
 
         console.log('Updating learning progress:', progress); // 添加调试信息
-        firebase.firestore().collection('users').doc(userId).update({
+        firebase.firestore().collection('users').doc(user.uid).update({
             learning: progress
         }).then(() => {
             console.log('Learning status updated successfully:', progress);
