@@ -1,7 +1,7 @@
 const diveLinker = new DiveLinker('dive1');
 
 let currentProject = '30590';
-let userId = null; // 添加userId变量
+let userId = null;
 let valueFrom30448 = 0;
 let valueFrom30603 = 0;
 let valueFrom30599 = 0;
@@ -123,6 +123,18 @@ function getNextStage() {
     return null;
 }
 
+function updateLearningProgress(progress) {
+    if (userId) {
+        firebase.firestore().collection('userProgress').doc(userId).set({
+            learning: progress
+        }, { merge: true }).then(() => {
+            console.log('Learning status updated successfully');
+        }).catch((error) => {
+            console.error('Error updating learning status:', error);
+        });
+    }
+}
+
 function checkAndSetNextProject() {
     if (diveLinker.checkComplete()) {
         const nextStage = getNextStage();
@@ -185,8 +197,8 @@ setInterval(() => {
 
 setProject('30590'); // 初始化设置第一个项目
 
-// 初始化 Firebase
-function initializeFirebase() {
+// Firebase 初始化
+document.addEventListener('DOMContentLoaded', function() {
     var firebaseConfig = {
         apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
         authDomain: "biologylearning-s11055013.firebaseapp.com",
@@ -196,13 +208,8 @@ function initializeFirebase() {
         appId: "1:743496923725:web:866adef56bd80b02d53a04"
     };
     firebase.initializeApp(firebaseConfig);
-}
 
-// 确保Firebase SDK初始化
-document.addEventListener('DOMContentLoaded', function() {
-    initializeFirebase();
-
-    // 接收父页面传递的消息
+    // 接收父頁面傳遞的訊息
     window.addEventListener('message', function(event) {
         if (event.data.type === 'auth') {
             userId = event.data.userId;
@@ -210,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             console.log('Received user data:', userId, displayName);
 
-            // 示例：将用户ID保存到Firebase
+            // 將用戶信息存儲到Firebase
             firebase.firestore().collection('users').doc(userId).set({
                 userId: userId,
                 displayName: displayName,
