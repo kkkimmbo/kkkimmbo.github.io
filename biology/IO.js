@@ -20,7 +20,7 @@ function setProject(projectId) {
 
     // 存储当前项目到 Firebase
     if (userId) {
-        firebase.firestore().collection('users').doc(user.uid).set({
+        firebase.firestore().collection('users').doc(userId).set({
             currentProject: projectId
         }, { merge: true }).then(() => {
             console.log('Current project saved to Firestore');
