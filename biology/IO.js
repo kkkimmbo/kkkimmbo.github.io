@@ -194,6 +194,36 @@ function checkAndSetNextProject() {
                         field: 'learning'
                     });
                 }
+
+                if (currentProject === '30670') {
+                    const outputValue30670 = parseInt(diveLinker.getAttr('ea3149c1a213403d91e83a0d83a88a07'));
+                    const registerStatus = outputValue30670 === 1 ? '已完成協助分表單任務' : '未完成協助分表單任務';
+                    sendMessageToParent({
+                        type: 'updateFirebaseStatus',
+                        status: registerStatus,
+                        field: 'register'
+                    });
+                }
+
+                if (currentProject === '30625') {
+                    const outputValue30625 = parseInt(diveLinker.getAttr('522a12e421de43f8be907eebba83c00a'));
+                    const invitationStatus = outputValue30625 === 1 ? '已完成協助發送邀請函任務' : '未完成協助發送邀請函任務';
+                    sendMessageToParent({
+                        type: 'updateFirebaseStatus',
+                        status: invitationStatus,
+                        field: 'invitation'
+                    });
+                }
+
+                if (currentProject === '30634') {
+                    const outputValue30634 = parseInt(diveLinker.getAttr('9c8ab52b37cd40a7ac8cfa477b29c51d'));
+                    const natureStatus = outputValue30634 === 1 ? '守護了自然環境！' : '已呼籲守護自然環境的重要！';
+                    sendMessageToParent({
+                        type: 'updateFirebaseStatus',
+                        status: natureStatus,
+                        field: 'nature'
+                    });
+                }
             }, 1000);
         }
     }
