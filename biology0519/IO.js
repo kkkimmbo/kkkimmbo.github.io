@@ -1,7 +1,6 @@
 const diveLinker = new DiveLinker('dive1');
 
 let currentProject = '30590';
-let userId = null;
 let valueFrom30448 = 0;
 let valueFrom30603 = 0;
 let valueFrom30599 = 0;
@@ -17,13 +16,6 @@ function setProject(projectId) {
     diveLinker.setProject(projectId);
     currentProject = projectId;
     console.log(`Set project to ${projectId}`);
-
-    // 存储当前项目到 Firebase
-    if (userId) {
-        firebase.firestore().collection('userProgress').doc(userId).set({
-            currentProject: projectId
-        }, { merge: true });
-    }
 }
 
 function getNextStage() {
@@ -119,12 +111,9 @@ function getNextStage() {
     return null;
 }
 
-function updateLearningProgress(progress) {
-    if (userId) {
-        firebase.firestore().collection('userProgress').doc(userId).set({
-            learning: progress
-        }, { merge: true });
-    }
+function sendMessageToParent(message) {
+    console.log("Sending message to parent:", message);
+    window.parent.postMessage(message, '*'); // 使用 '*' 確保消息可以被父頁面接收
 }
 
 function checkAndSetNextProject() {
@@ -166,16 +155,14 @@ function checkAndSetNextProject() {
                         { id: '90899e0eef064729b27f41a1728eaa35', value: valueFrom30443 },
                         { id: '23a59353accf442694adb5ff024b3eb3', value: finalValue30605 }
                     ]);
-                } else if (currentProject === '30414') {
-                    if (valueFrom30414 > 80 && valueFrom30410 > 80) {
-                        updateLearningProgress('完成哺乳動物、節肢動物學習');
-                    } else if (valueFrom30414 > 80) {
-                        updateLearningProgress('完成哺乳類動物學習');
-                    } else if (valueFrom30410 > 80) {
-                        updateLearningProgress('完成節肢動物學習');
-                    } else {
-                        updateLearningProgress('未完成哺乳動物、節肢動物學習');
-                    }
+                }
+
+                // 檢查是否為專案30594，並更新Firebase狀態
+                if (currentProject === '30594') {
+                    sendMessageToParent({
+                        type: 'updateFirebaseStatus',
+                        status: '已完成'
+                    });
                 }
             }, 1000);
         }
@@ -187,30 +174,4 @@ setInterval(() => {
     checkAndSetNextProject();
 }, 1000);
 
-setProject('30590'); // 初始化设置第一个项目
-
-// 初始化 Firebase
-var firebaseConfig = {
-    apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-    authDomain: "biologylearning-s11055013.firebaseapp.com",
-    projectId: "biologylearning-s11055013",
-    storageBucket: "biologylearning-s11055013.appspot.com",
-    messagingSenderId: "743496923725",
-    appId: "1:743496923725:web:866adef56bd80b02d53a04"
-};
-firebase.initializeApp(firebaseConfig);
-
-// 处理身份验证状态变化
-firebase.auth().onAuthStateChanged(function (user) {
-    if (user) {
-        userId = user.uid;
-        document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
-        document.getElementById('logout-btn').style.display = 'inline';
-        document.getElementById('google-login-btn').style.display = 'none';
-    } else {
-        userId = null;
-        document.getElementById('user-info').textContent = '未登录';
-        document.getElementById('logout-btn').style.display = 'none';
-        document.getElementById('google-login-btn').style.display = 'inline';
-    }
-});
+setProject('30590'); // 初始化设置第一个项目。
