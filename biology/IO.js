@@ -22,7 +22,13 @@ function setProject(projectId) {
     if (userId) {
         firebase.firestore().collection('userProgress').doc(userId).set({
             currentProject: projectId
-        }, { merge: true });
+        }, { merge: true }).then(() => {
+            console.log('Current project saved to Firestore');
+        }).catch((error) => {
+            console.error('Error saving current project:', error);
+        });
+    } else {
+        console.error('No userId found when setting project');
     }
 }
 
@@ -132,6 +138,7 @@ function updateLearningProgress() {
             progress = '未完成哺乳動物、節肢動物學習';
         }
 
+        console.log('Updating learning progress:', progress); // 添加调试信息
         firebase.firestore().collection('users').doc(userId).update({
             learning: progress
         }).then(() => {
@@ -139,6 +146,8 @@ function updateLearningProgress() {
         }).catch((error) => {
             console.error('Error updating learning status:', error);
         });
+    } else {
+        console.error('No userId found when updating learning progress');
     }
 }
 
@@ -211,11 +220,13 @@ firebase.initializeApp(firebaseConfig);
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
         userId = user.uid;
+        console.log('User signed in:', userId); // 添加调试信息
         document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
         document.getElementById('logout-btn').style.display = 'inline';
         document.getElementById('google-login-btn').style.display = 'none';
     } else {
         userId = null;
+        console.log('No user signed in'); // 添加调试信息
         document.getElementById('user-info').textContent = '未登录';
         document.getElementById('logout-btn').style.display = 'none';
         document.getElementById('google-login-btn').style.display = 'block';
