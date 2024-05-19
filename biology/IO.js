@@ -240,3 +240,26 @@ firebase.auth().onAuthStateChanged(function(user) {
         document.getElementById('google-login-btn').style.display = 'block';
     }
 });
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Retrieve the user object from local storage
+    var user = JSON.parse(window.localStorage.getItem('firebaseUser'));
+
+    if (user) {
+        var userId = user.uid;
+        console.log('User ID:', userId);
+        
+        // Use the userId for any database operations
+        // For example, write to the database
+        var db = firebase.firestore();
+        db.collection('users').doc(userId).set({
+            name: user.displayName,
+            email: user.email
+        }).then(() => {
+            console.log('User data written successfully!');
+        }).catch((error) => {
+            console.error('Error writing document: ', error);
+        });
+    } else {
+        console.log('No user is signed in.');
+    }
+});
