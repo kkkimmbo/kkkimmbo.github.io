@@ -197,7 +197,7 @@ setInterval(() => {
 
 setProject('30590'); // 初始化设置第一个项目
 
-// Firebase 初始化
+// Firebase 初始化和消息监听器
 document.addEventListener('DOMContentLoaded', function() {
     var firebaseConfig = {
         apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
@@ -209,7 +209,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     firebase.initializeApp(firebaseConfig);
 
-    // 接收父頁面傳遞的訊息
     window.addEventListener('message', function(event) {
         if (event.data.type === 'auth') {
             userId = event.data.userId;
@@ -217,7 +216,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             console.log('Received user data:', userId, displayName);
 
-            // 將用戶信息存儲到Firebase
             firebase.firestore().collection('users').doc(userId).set({
                 userId: userId,
                 displayName: displayName,
