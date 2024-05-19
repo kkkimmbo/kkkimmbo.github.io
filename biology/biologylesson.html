@@ -137,8 +137,6 @@
             if (user) {
                 console.log("User is signed in:", user);
                 document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
-                document.getElementById('logout-btn').style.display = 'inline';
-                document.getElementById('google-login-btn').style.display = 'none';
             } else {
                 console.log("No user is signed in.");
                 document.getElementById('user-info').textContent = '未登录';
@@ -173,7 +171,6 @@
             db.collection("users").doc(userId).set(updateData, { merge: true })
             .then(() => {
                 console.log("Document successfully written!");
-                document.getElementById('user-info').textContent = status;
             })
             .catch((error) => {
                 console.error("Error writing document: ", error);
