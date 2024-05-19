@@ -1,7 +1,6 @@
 const diveLinker = new DiveLinker('dive1');
 
 let currentProject = '30590';
-let userId = null;
 let valueFrom30448 = 0;
 let valueFrom30603 = 0;
 let valueFrom30599 = 0;
@@ -17,17 +16,6 @@ function setProject(projectId) {
     diveLinker.setProject(projectId);
     currentProject = projectId;
     console.log(`Set project to ${projectId}`);
-
-    // 存储当前项目到 Firebase
-    if (userId) {
-        firebase.firestore().collection('userProgress').doc(userId).set({
-            currentProject: projectId
-        }, { merge: true }).then(() => {
-            console.log('Current project saved to Firestore');
-        }).catch((error) => {
-            console.error('Error saving current project:', error);
-        });
-    }
 }
 
 function getNextStage() {
@@ -123,16 +111,8 @@ function getNextStage() {
     return null;
 }
 
-function updateLearningProgress(progress) {
-    if (userId) {
-        firebase.firestore().collection('userProgress').doc(userId).set({
-            learning: progress
-        }, { merge: true }).then(() => {
-            console.log('Learning status updated successfully');
-        }).catch((error) => {
-            console.error('Error updating learning status:', error);
-        });
-    }
+function sendMessageToParent(message) {
+    window.parent.postMessage(message, 'https://dive.nutn.edu.tw'); // 請確保這個URL是你父頁面的URL
 }
 
 function checkAndSetNextProject() {
@@ -174,16 +154,14 @@ function checkAndSetNextProject() {
                         { id: '90899e0eef064729b27f41a1728eaa35', value: valueFrom30443 },
                         { id: '23a59353accf442694adb5ff024b3eb3', value: finalValue30605 }
                     ]);
-                } else if (currentProject === '30414') {
-                    if (valueFrom30414 > 80 && valueFrom30410 > 80) {
-                        updateLearningProgress('完成哺乳動物、節肢動物學習');
-                    } else if (valueFrom30414 > 80) {
-                        updateLearningProgress('完成哺乳類動物學習');
-                    } else if (valueFrom30410 > 80) {
-                        updateLearningProgress('完成節肢動物學習');
-                    } else {
-                        updateLearningProgress('未完成哺乳動物、節肢動物學習');
-                    }
+                }
+
+                // 檢查是否為專案30594，並更新Firebase狀態
+                if (currentProject === '30594') {
+                    sendMessageToParent({
+                        type: 'updateFirebaseStatus',
+                        status: '已完成'
+                    });
                 }
             }, 1000);
         }
@@ -195,45 +173,4 @@ setInterval(() => {
     checkAndSetNextProject();
 }, 1000);
 
-setProject('30590'); // 初始化设置第一个项目
-
-// Firebase 初始化和消息监听器
-document.addEventListener('DOMContentLoaded', function() {
-    var firebaseConfig = {
-        apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-        authDomain: "biologylearning-s11055013.firebaseapp.com",
-        projectId: "biologylearning-s11055013",
-        storageBucket: "biologylearning-s11055013.appspot.com",
-        messagingSenderId: "743496923725",
-        appId: "1:743496923725:web:866adef56bd80b02d53a04"
-    };
-    firebase.initializeApp(firebaseConfig);
-
-    window.addEventListener('message', function(event) {
-        if (event.data.type === 'auth') {
-            userId = event.data.userId;
-            const displayName = event.data.displayName;
-
-            console.log('Received user data:', userId, displayName);
-
-            firebase.firestore().collection('users').doc(userId).set({
-                userId: userId,
-                displayName: displayName,
-                mammalsvideo: '已完成觀看哺乳類動物影片'
-            }, { merge: true }).then(() => {
-                console.log('Mammals video progress updated successfully');
-            }).catch((error) => {
-                console.error('Error updating mammals video progress:', error);
-            });
-        }
-    });
-
-    firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-            userId = user.uid;
-            console.log('User signed in:', userId);
-        } else {
-            console.log('No user signed in');
-        }
-    });
-});
+setProject('30590'); // 初始化设置第一个项目。
