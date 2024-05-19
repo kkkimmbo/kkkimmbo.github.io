@@ -210,11 +210,11 @@ function initializeFirebase() {
     firebase.initializeApp(firebaseConfig);
 }
 
-// 確保Firebase SDK初始化
+// 确保Firebase SDK初始化
 document.addEventListener('DOMContentLoaded', function() {
     initializeFirebase();
 
-    // 接收父頁面傳遞的訊息
+    // 接收父页面传递的消息
     window.addEventListener('message', function(event) {
         if (event.data.type === 'auth') {
             userId = event.data.userId;
@@ -222,7 +222,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             console.log('Received user data:', userId, displayName);
 
-            // 现在可以在iframe中使用userId和displayName
             // 示例：将用户ID保存到Firebase
             firebase.firestore().collection('users').doc(userId).set({
                 userId: userId,
@@ -245,4 +244,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-</script>
