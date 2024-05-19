@@ -92,30 +92,30 @@
         <img src="bernese.JPG" alt="學習平台Logo" class="logo">
     </header>
     <nav>
-        <div id="user-info">未登錄</div>
+        <div id="user-info">未登录</div>
         <ul>
             <li><a href="biologyhome.html">首頁</a></li>
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
-            <li><a href="biologyvideos.html">教學影片</a></li>
+            <li><a href="biologyvideos.html">教學视频</a></li>
             <li><a href='biologyprofile.html'>個人檔案</a></li>
         </ul>
-   
     </nav>
     <div class="content">
         <h2>課程介紹</h2>
         <div class="course-item">
-            <h3>哺乳類動物介紹</h3>
+            <h3>課程內容</h3>
             <p>探討哺乳類動物的基本特徵、生理構造及其生態習性。</p>
-        </div>
-        <div class="course-item">
-            <h3>節肢動物的多樣性</h3>
-            <p>了解節肢動物的分類、生存環境及其在自然界中的角色。</p>
+            <iframe id="iframe_" src="https://dive.nutn.edu.tw/Experiment/kaleTestExperiment5.jsp?eid=30590&record=false" frameborder="0" name="dive1" width="100%" height="768px"></iframe>
         </div>
     </div>
     <footer>
         <p>版權所有 © 生物學習平台</p>
     </footer>
+
+    <!-- 引入脚本 -->
+    <script src="https://dive.nutn.edu.tw/Experiment/js/dive.linker.js"></script>
+    <script src="IO.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
     <script>
@@ -137,13 +137,12 @@
                 document.getElementById('logout-btn').style.display = 'inline';
                 document.getElementById('google-login-btn').style.display = 'none';
             } else {
-                document.getElementById('user-info').textContent = '未登錄';
-                document.getElementById('logout-btn').style.display = 'none';
-                document.getElementById('google-login-btn').style.display = 'inline';
+                document.getElementById('user-info').textContent = '未登录';
+                
             }
         });
-        
-
     </script>
 </body>
 </html>
+
+
