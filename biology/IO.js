@@ -1,7 +1,7 @@
 const diveLinker = new DiveLinker('dive1');
 
 let currentProject = '30590';
-let userId = null;
+let userId = null; // 添加userId变量
 let valueFrom30448 = 0;
 let valueFrom30603 = 0;
 let valueFrom30599 = 0;
@@ -121,18 +121,6 @@ function getNextStage() {
         }
     }
     return null;
-}
-
-function updateLearningProgress(progress) {
-    if (userId) {
-        firebase.firestore().collection('userProgress').doc(userId).set({
-            learning: progress
-        }, { merge: true }).then(() => {
-            console.log('Learning status updated successfully');
-        }).catch((error) => {
-            console.error('Error updating learning status:', error);
-        });
-    }
 }
 
 function checkAndSetNextProject() {
