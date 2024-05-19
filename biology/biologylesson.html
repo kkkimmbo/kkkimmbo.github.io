@@ -165,6 +165,7 @@
         }, false);
 
         function updateFirebaseStatus(userId, status) {
+            console.log(`Updating Firebase status for userId: ${userId}, status: ${status}`);
             db.collection("users").doc(userId).set({
                 mammalsvideo: status
             }, { merge: true })
