@@ -147,7 +147,7 @@
         window.addEventListener('message', function(event) {
             console.log("Received message from iframe:", event.data);
             // 接受來自信任來源的消息
-            const trustedOrigins = ['https://dive.nutn.edu.tw', 'https://kkkimmbo.github.io'];
+            const trustedOrigins = ['https://dive.nutn.edu.tw', 'https://kkkimbo.github.io'];
             if (!trustedOrigins.includes(event.origin)) {
                 console.log("Ignoring message from unknown origin:", event.origin);
                 return; // 忽略來自其他來源的消息
