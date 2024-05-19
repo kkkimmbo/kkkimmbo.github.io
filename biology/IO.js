@@ -126,7 +126,7 @@ function getNextStage() {
 }
 
 function updateLearningProgress() {
-    if (user.uid) {
+    if (userId) {
         let progress = '';
         if (valueFrom30414 > 80 && valueFrom30410 > 80) {
             progress = '完成哺乳動物、節肢動物學習';
@@ -139,7 +139,7 @@ function updateLearningProgress() {
         }
 
         console.log('Updating learning progress:', progress); // 添加调试信息
-        firebase.firestore().collection('users').doc(user.uid).update({
+        firebase.firestore().collection('users').doc(userId).update({
             learning: progress
         }).then(() => {
             console.log('Learning status updated successfully:', progress);
