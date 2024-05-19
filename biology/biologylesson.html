@@ -93,7 +93,7 @@
     </header>
     <nav>
         <div id="user-info">未登录</div>
-        <button id="google-login-btn">使用 Google 帳號登錄</button>
+        <button id="google-login-btn" style="display: none;">使用 Google 帳號登錄</button>
         <button id="logout-btn" style="display: none;">登出</button>
         <ul>
             <li><a href="biologyhome.html">首頁</a></li>
@@ -134,17 +134,13 @@
         firebase.initializeApp(firebaseConfig);
         var db = firebase.firestore();
 
-        let userId = null;
-
         // 处理身份验证状态变化
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                userId = user.uid;
                 document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
                 document.getElementById('logout-btn').style.display = 'block';
                 document.getElementById('google-login-btn').style.display = 'none';
             } else {
-                userId = null;
                 document.getElementById('user-info').textContent = '未登录';
                 document.getElementById('logout-btn').style.display = 'none';
                 document.getElementById('google-login-btn').style.display = 'block';
