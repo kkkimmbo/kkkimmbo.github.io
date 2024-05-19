@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="google-signin-client_id" content="130442278978-j29rl7r5srslikgar49cu0616e24icep.apps.googleusercontent.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>課程介紹 - 生物學習平台</title>
     <style>
         body {
@@ -93,6 +93,8 @@
     </header>
     <nav>
         <div id="user-info">未登录</div>
+        <button id="google-login-btn">使用 Google 帳號登錄</button>
+        <button id="logout-btn" style="display: none;">登出</button>
         <ul>
             <li><a href="biologyhome.html">首頁</a></li>
             <li><a href="biologylesson.html">課程學習</a></li>
@@ -120,46 +122,41 @@
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
     <script>
-          var firebaseConfig = {
+        // 初始化 Firebase
+        var firebaseConfig = {
             apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
             authDomain: "biologylearning-s11055013.firebaseapp.com",
-            databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
             projectId: "biologylearning-s11055013",
             storageBucket: "biologylearning-s11055013.appspot.com",
             messagingSenderId: "743496923725",
             appId: "1:743496923725:web:866adef56bd80b02d53a04"
         };
         firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
 
-        var provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
+        let userId = null;
 
-        function saveUserData(user) {
-            firebase.firestore().collection('users').doc(user.uid).set({
-                username: user.displayName,
-                useremail: user.email
-            }, { merge: true })
-            .then(() => console.log("User data saved."))
-            .catch(error => console.error("Error saving user data: ", error));
-        }
-
-        firebase.auth().onAuthStateChanged(user => {
+        // 处理身份验证状态变化
+        firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
+                userId = user.uid;
                 document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
                 document.getElementById('logout-btn').style.display = 'block';
                 document.getElementById('google-login-btn').style.display = 'none';
-                saveUserData(user);
             } else {
+                userId = null;
                 document.getElementById('user-info').textContent = '未登录';
                 document.getElementById('logout-btn').style.display = 'none';
                 document.getElementById('google-login-btn').style.display = 'block';
             }
         });
 
+        // 登錄和登出功能
         function signInWithGoogle() {
+            var provider = new firebase.auth.GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
             firebase.auth().signInWithPopup(provider).then(result => {
                 const user = result.user;
-                console.log('Signed in as: ' + user.displayName);
                 saveUserData(user);
             }).catch(error => {
                 console.error('Sign in failed: ', error.code, error.message);
@@ -177,12 +174,22 @@
             });
         }
 
+        function saveUserData(user) {
+            db.collection('users').doc(user.uid).set({
+                username: user.displayName,
+                useremail: user.email
+            }, { merge: true })
+            .then(() => console.log("User data saved."))
+            .catch(error => console.error("Error saving user data: ", error));
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('google-login-btn').addEventListener('click', signInWithGoogle);
             document.getElementById('logout-btn').addEventListener('click', signOut);
         });
 
         const diveLinker = new DiveLinker('dive1');
+
         let currentProject = '30590';
         let valueFrom30448 = 0;
         let valueFrom30603 = 0;
@@ -344,6 +351,18 @@
                         }
                     }, 1000);
                 }
+            }
+        }
+
+        function updateFirebaseLearningStatus(status) {
+            if (userId) {
+                db.collection('users').doc(userId).update({
+                    learning: status
+                }).then(() => {
+                    console.log('Learning status updated successfully.');
+                }).catch((error) => {
+                    console.error('Error updating learning status: ', error);
+                });
             }
         }
 
