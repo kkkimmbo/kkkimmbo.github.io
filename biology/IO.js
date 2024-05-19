@@ -71,12 +71,16 @@ function getNextStage() {
         valueFrom30414 = outputValue30414 + valueFrom30448 + valueFrom30599 + valueFrom30601 + valueFrom30447;
 
         if (valueFrom30414 > 80 && valueFrom30410 > 80) {
+            updateLearningProgress('完成哺乳動物、節肢動物學習');
             return '30670';
         } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
+            updateLearningProgress('完成哺乳類動物學習');
             return '30595';
         } else if (valueFrom30414 <= 80 && valueFrom30410 > 80) {
+            updateLearningProgress('完成節肢動物學習');
             return '30594';
         } else {
+            updateLearningProgress('未完成哺乳動物、節肢動物學習');
             return Math.random() < 0.5 ? '30594' : '30595';
         }
     } else if (currentProject === '30410') {
@@ -84,12 +88,16 @@ function getNextStage() {
         valueFrom30410 = outputValue30410 + valueFrom30603 + valueFrom30602 + valueFrom30443 + valueFrom30605;
 
         if (valueFrom30414 > 80 && valueFrom30410 > 80) {
+            updateLearningProgress('完成哺乳動物、節肢動物學習');
             return '30670';
         } else if (valueFrom30414 <= 80 && valueFrom30410 > 80) {
+            updateLearningProgress('完成節肢動物學習');
             return '30594';
         } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
+            updateLearningProgress('完成哺乳類動物學習');
             return '30595';
         } else {
+            updateLearningProgress('未完成哺乳動物、節肢動物學習');
             return Math.random() < 0.5 ? '30594' : '30595';
         }
     } else if (currentProject === '30670') {
@@ -121,7 +129,7 @@ function getNextStage() {
 
 function updateLearningProgress(progress) {
     if (userId) {
-        firebase.firestore().collection('userProgress').doc(userId).set({
+        firebase.firestore().collection('users').doc(userId).update({
             learning: progress
         }, { merge: true });
     }
@@ -190,25 +198,27 @@ setInterval(() => {
 setProject('30590'); // 初始化设置第一个项目
 
 // 初始化 Firebase
-  // Initialize Firebase
-        var firebaseConfig = {
-            apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-            authDomain: "biologylearning-s11055013.firebaseapp.com",
-            projectId: "biologylearning-s11055013",
-            storageBucket: "biologylearning-s11055013.appspot.com",
-            messagingSenderId: "743496923725",
-            appId: "1:743496923725:web:866adef56bd80b02d53a04"
-        };
-        firebase.initializeApp(firebaseConfig);
+var firebaseConfig = {
+    apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+    authDomain: "biologylearning-s11055013.firebaseapp.com",
+    projectId: "biologylearning-s11055013",
+    storageBucket: "biologylearning-s11055013.appspot.com",
+    messagingSenderId: "743496923725",
+    appId: "1:743496923725:web:866adef56bd80b02d53a04"
+};
+firebase.initializeApp(firebaseConfig);
 
-        // Handle authentication state changes
-        firebase.auth().onAuthStateChanged(function(user) {
-            if (user) {
-                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
-                document.getElementById('logout-btn').style.display = 'inline';
-                document.getElementById('google-login-btn').style.display = 'none';
-            } else {
-                document.getElementById('user-info').textContent = '未登录';
-                
-            }
-        });
+// Handle authentication state changes
+firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+        userId = user.uid;
+        document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+        document.getElementById('logout-btn').style.display = 'inline';
+        document.getElementById('google-login-btn').style.display = 'none';
+    } else {
+        userId = null;
+        document.getElementById('user-info').textContent = '未登录';
+        document.getElementById('logout-btn').style.display = 'none';
+        document.getElementById('google-login-btn').style.display = 'block';
+    }
+});
