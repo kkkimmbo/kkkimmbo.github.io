@@ -115,9 +115,10 @@
 
     <!-- 引入脚本 -->
     <script src="https://dive.nutn.edu.tw/Experiment/js/dive.linker.js"></script>
-    <script src="IO.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
+    <script src="IO.js"></script>
     <script>
         // Initialize Firebase
         var firebaseConfig = {
@@ -133,24 +134,41 @@
         // Handle authentication state changes
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
-                const userId = user.uid;
-                const displayName = user.displayName || 'Anonymous';
-                document.getElementById('user-info').textContent = 'Hello, ' + displayName;
+                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
                 document.getElementById('logout-btn').style.display = 'inline';
                 document.getElementById('google-login-btn').style.display = 'none';
-
-                // 将用户信息传递给iframe
-                document.getElementById('iframe_').contentWindow.postMessage({
-                    type: 'auth',
-                    userId: userId,
-                    displayName: displayName
-                }, '*');
             } else {
                 document.getElementById('user-info').textContent = '未登录';
-                document.getElementById('logout-btn').style.display = 'none';
-                document.getElementById('google-login-btn').style.display = 'block';
             }
         });
+
+        // 接收來自iframe的消息
+        window.addEventListener('message', function(event) {
+            if (event.origin !== 'https://dive.nutn.edu.tw') {
+                return; // 忽略來自其他來源的消息
+            }
+            const data = event.data;
+            if (data.type === 'updateFirebaseStatus') {
+                const user = firebase.auth().currentUser;
+                if (user) {
+                    updateFirebaseStatus(user.uid, data.status);
+                }
+            }
+        }, false);
+
+        function updateFirebaseStatus(userId, status) {
+            const db = firebase.firestore();
+            db.collection("users").doc(userId).set({
+                mammalsvideo: status
+            }, { merge: true })
+            .then(() => {
+                console.log("Document successfully written!");
+                document.getElementById('user-info').textContent = '已完成哺乳動物影片觀看';
+            })
+            .catch((error) => {
+                console.error("Error writing document: ", error);
+            });
+        }
     </script>
 </body>
 </html>
