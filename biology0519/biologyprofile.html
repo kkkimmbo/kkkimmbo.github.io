@@ -155,7 +155,7 @@
                         const wrongQuestions = userData.wrongquestions || [];
                         const wrongQuestionsDiv = document.getElementById('wrong-answers');
                         wrongQuestionsDiv.innerHTML = wrongQuestions.map(q => 
-                            `<div class="wrong-question"><strong>題目：</strong>${q.question}<br><strong>你的選擇：</strong>${q.selectedOption}</div>`
+                            `<div class="wrong-question"><strong>題目：</strong>${q.question}<br><strong>正確答案：</strong>${q.correctAnswer}</div>`
                         ).join("") || 'No mistakes recorded';
                     } else {
                         document.getElementById('score').textContent = 'No score yet';
