@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>課程學習 - 生物學習平台</title>
+    <title>課程介紹 - 生物學習平台</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,41 +11,36 @@
             padding: 0;
             background-color: #f4f4f9;
         }
-
         header, footer {
             background-color: #204051;
             color: white;
             text-align: center;
             padding: 10px 0;
         }
-
-        h1, h2 {
-            margin: 0;
-        }
-
         nav {
             display: flex;
             justify-content: center;
+            align-items: center;
             background-color: #3b6978;
-            padding: 20px 0;
+            padding: 10px 20px;
         }
-
         nav ul {
             list-style-type: none;
             padding: 0;
+            display: flex;
+            margin: 0;
         }
-
         nav ul li {
-            display: inline;
-            margin-right: 10px;
+            margin-right: 20px;
         }
-
+        nav ul li:last-child {
+            margin-right: 0;
+        }
         nav ul li a {
             text-decoration: none;
             color: white;
             font-weight: bold;
         }
-
         button {
             padding: 10px 20px;
             cursor: pointer;
@@ -54,92 +49,286 @@
             color: white;
             border-radius: 5px;
         }
-
         button:hover {
             background-color: #cae8d5;
         }
-
+        #user-info {
+            color: white;
+            flex-grow: 1;
+            text-align: left;
+            padding-left: 20px;
+        }
         .content {
             padding: 20px;
             text-align: center;
         }
-
-        footer p {
-            margin: 0;
-            font-size: 0.8rem;
-        }
-
         .course-item {
             background-color: #ffffff;
             margin: 10px auto;
             padding: 20px;
             width: 80%;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .course-item h3 {
-            color: #204051;
-        }
-
-        .course-item p {
             text-align: left;
         }
+        footer p {
+            margin: 0;
+            font-size: 0.8rem;
+        }
+        .logo {
+            display: block;
+            margin: auto;
+            width: 80px;
+            animation: spin 20s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
-    <script src="https://apis.google.com/js/api:client.js"></script>
 </head>
 <body>
     <header>
         <h1>生物學習平台</h1>
+        <img src="bernese.JPG" alt="學習平台Logo" class="logo">
     </header>
     <nav>
-        <button id="google-login-btn">使用 Google 帳號登錄</button>
+        <div id="user-info">未登录</div>
         <ul>
             <li><a href="biologyhome.html">首頁</a></li>
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
-            <li><a href="videos.html">教學影片</a></li>
+            <li><a href="biologyvideos.html">教學视频</a></li>
+            <li><a href='biologyprofile.html'>個人檔案</a></li>
         </ul>
     </nav>
     <div class="content">
-        <h2>課程學習</h2>
+        <h2>課程介紹</h2>
         <div class="course-item">
-            <h3>哺乳動物介紹</h3>
-            <p>學習各種哺乳動物的基本特徵和分類。</p>
-        </div>
-        <div class="course-item">
-            <h3>節肢動物的世界</h3>
-            <p>探索節肢動物的多樣性，包括昆蟲、蛛形動物等。</p>
+            <h3>課程內容</h3>
+            <p>探討哺乳類動物的基本特徵、生理構造及其生態習性。</p>
+            <iframe id="iframe_" src="https://dive.nutn.edu.tw/Experiment/kaleTestExperiment5.jsp?eid=30590&record=false" frameborder="0" name="dive1" width="100%" height="768px"></iframe>
         </div>
     </div>
     <footer>
         <p>版權所有 © 生物學習平台</p>
     </footer>
+
+    <!-- 引入脚本 -->
+    <script src="https://dive.nutn.edu.tw/Experiment/js/dive.linker.js"></script>
+    <script src="IO.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
     <script>
-        let googleAuth;
+        // 初始化 Firebase
+        var firebaseConfig = {
+            apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+            authDomain: "biologylearning-s11055013.firebaseapp.com",
+            projectId: "biologylearning-s11055013",
+            storageBucket: "biologylearning-s11055013.appspot.com",
+            messagingSenderId: "743496923725",
+            appId: "1:743496923725:web:866adef56bd80b02d53a04"
+        };
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
 
-        function initGoogleAuth() {
-            gapi.load('auth2', function() {
-                googleAuth = gapi.auth2.init({
-                    client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com'
-                });
-            });
-        }
+        let userId = null;
 
-        document.getElementById('google-login-btn').addEventListener('click', function() {
-            if (googleAuth) {
-                googleAuth.signIn().then(function(googleUser) {
-                    console.log("User signed in: ", googleUser.getBasicProfile().getName());
-                    // 这里可以重定向到主页面或执行其他逻辑
-                }).catch(function(error) {
-                    console.error("Error signing in: ", error);
-                });
+        // 处理身份验证状态变化
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (user) {
+                userId = user.uid;
+                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+            } else {
+                userId = null;
+                document.getElementById('user-info').textContent = '未登录';
             }
         });
 
-        window.onload = function() {
-            initGoogleAuth();
-        };
-       
+        const diveLinker = new DiveLinker('dive1');
+
+        let currentProject = '30590';
+        let valueFrom30448 = 0;
+        let valueFrom30603 = 0;
+        let valueFrom30599 = 0;
+        let valueFrom30602 = 0;
+        let valueFrom30601 = 0;
+        let valueFrom30443 = 0;
+        let valueFrom30447 = 0;
+        let valueFrom30414 = 0;
+        let valueFrom30605 = 0;
+        let valueFrom30410 = 0;
+
+        function setProject(projectId) {
+            diveLinker.setProject(projectId);
+            currentProject = projectId;
+            console.log(`Set project to ${projectId}`);
+        }
+
+        function getNextStage() {
+            if (currentProject === '30590') {
+                return '30699';
+            } else if (currentProject === '30699') {
+                const mammalsOutput = diveLinker.getAttr('acf3f141f237480aa6348f33746694ef');
+                const arthropodsOutput = diveLinker.getAttr('3207de6f8b8e47a98aebfaaedd084118');
+
+                if (mammalsOutput === 1) {
+                    return '30594';
+                } else if (arthropodsOutput === 1) {
+                    return '30595';
+                }
+            } else if (currentProject === '30594') {
+                return '30448';
+            } else if (currentProject === '30595') {
+                return '30603';
+            } else if (currentProject === '30448') {
+                valueFrom30448 = parseInt(diveLinker.getAttr('477c82f179d14522b6fac6b8d8a61c79'));
+                return '30599';
+            } else if (currentProject === '30603') {
+                valueFrom30603 = parseInt(diveLinker.getAttr('3c9da4886fa84d07952e02e06f8a3870'));
+                return '30602';
+            } else if (currentProject === '30599') {
+                valueFrom30599 = parseInt(diveLinker.getAttr('d9aa94a1694044989f5783760838ee37'));
+                return '30601';
+            } else if (currentProject === '30602') {
+                valueFrom30602 = parseInt(diveLinker.getAttr('a1b4f57dbc7642b6b2d245c1cb77bb37'));
+                return '30443';
+            } else if (currentProject === '30601') {
+                valueFrom30601 = parseInt(diveLinker.getAttr('a1b4f57dbc7642b6b2d245c1cb77bb37'));
+                return '30447';
+            } else if (currentProject === '30443') {
+                valueFrom30443 = parseInt(diveLinker.getAttr('90899e0eef064729b27f41a1728eaa35'));
+                return '30605';
+            } else if (currentProject === '30447') {
+                valueFrom30447 = parseInt(diveLinker.getAttr('30aa5e91843e468fac7cf6abe71cd10c'));
+                return '30414';
+            } else if (currentProject === '30605') {
+                valueFrom30605 = parseInt(diveLinker.getAttr('23a59353accf442694adb5ff024b3eb3'));
+                return '30410';
+            } else if (currentProject === '30414') {
+                const outputValue30414 = parseInt(diveLinker.getAttr('5f7d12ea2145450eab69b9b79630d03c'));
+                valueFrom30414 = outputValue30414 + valueFrom30448 + valueFrom30599 + valueFrom30601 + valueFrom30447;
+
+                if (valueFrom30414 > 80 && valueFrom30410 > 80) {
+                    updateFirebaseLearningStatus('完成哺乳動物、節肢動物學習');
+                    return '30670';
+                } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
+                    updateFirebaseLearningStatus('完成哺乳類動物學習');
+                    return '30595';
+                } else if (valueFrom30414 <= 80 && valueFrom30410 > 80) {
+                    updateFirebaseLearningStatus('完成節肢動物學習');
+                    return '30594';
+                } else {
+                    updateFirebaseLearningStatus('未完成哺乳動物、節肢動物學習');
+                    return Math.random() < 0.5 ? '30594' : '30595';
+                }
+            } else if (currentProject === '30410') {
+                const outputValue30410 = parseInt(diveLinker.getAttr('0afc0f39c48a453cb1fd32d5d11ae4da'));
+                valueFrom30410 = outputValue30410 + valueFrom30603 + valueFrom30602 + valueFrom30443 + valueFrom30605;
+
+                if (valueFrom30414 > 80 && valueFrom30410 > 80) {
+                    updateFirebaseLearningStatus('完成哺乳動物、節肢動物學習');
+                    return '30670';
+                } else if (valueFrom30414 <= 80 && valueFrom30410 > 80) {
+                    updateFirebaseLearningStatus('完成節肢動物學習');
+                    return '30594';
+                } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
+                    updateFirebaseLearningStatus('完成哺乳類動物學習');
+                    return '30595';
+                } else {
+                    updateFirebaseLearningStatus('未完成哺乳動物、節肢動物學習');
+                    return Math.random() < 0.5 ? '30594' : '30595';
+                }
+            } else if (currentProject === '30670') {
+                const outputValue30670 = parseInt(diveLinker.getAttr('ea3149c1a213403d91e83a0d83a88a07'));
+                if (outputValue30670 === 1) {
+                    return '30617';
+                } else if (outputValue30670 === 0) {
+                    return '30670';
+                }
+            } else if (currentProject === '30617') {
+                return '30625';
+            } else if (currentProject === '30625') {
+                const outputValue30625 = parseInt(diveLinker.getAttr('522a12e421de43f8be907eebba83c00a'));
+                if (outputValue30625 === 1) {
+                    return '30634';
+                } else if (outputValue30625 === 0) {
+                    return '30625';
+                }
+            } else if (currentProject === '30634') {
+                const outputValue30634 = parseInt(diveLinker.getAttr('9c8ab52b37cd40a7ac8cfa477b29c51d'));
+                if (outputValue30634 === 1) {
+                    return '30643';
+                } else if (outputValue30634 === 0) {
+                    return '30645';
+                }
+            }
+            return null;
+        }
+
+        function checkAndSetNextProject() {
+            if (diveLinker.checkComplete()) {
+                const nextStage = getNextStage();
+                if (nextStage) {
+                    setProject(nextStage);
+                    setTimeout(() => {
+                        if (currentProject === '30599') {
+                            diveLinker.setInput([{ id: '477c82f179d14522b6fac6b8d8a61c79', value: valueFrom30448 }]);
+                        } else if (currentProject === '30602') {
+                            diveLinker.setInput([{ id: '3c9da4886fa84d07952e02e06f8a3870', value: valueFrom30603 }]);
+                        } else if (currentProject === '30601') {
+                            const finalValue30601 = valueFrom30448 + valueFrom30599 + valueFrom30601;
+                            diveLinker.setInput([
+                                { id: '477c82f179d14522b6fac6b8d8a61c79', value: valueFrom30448 },
+                                { id: 'd9aa94a1694044989f5783760838ee37', value: valueFrom30599 },
+                                { id: 'a1b4f57dbc7642b6b2d245c1cb77bb37', value: finalValue30601 }
+                            ]);
+                        } else if (currentProject === '30443') {
+                            const finalValue30443 = valueFrom30603 + valueFrom30602 + valueFrom30443;
+                            diveLinker.setInput([
+                                { id: '3c9da4886fa84d07952e02e06f8a3870', value: valueFrom30603 },
+                                { id: 'a1b4f57dbc7642b6b2d245c1cb77bb37', value: valueFrom30602 },
+                                { id: '90899e0eef064729b27f41a1728eaa35', value: finalValue30443 }
+                            ]);
+                        } else if (currentProject === '30447') {
+                            const finalValue30447 = valueFrom30448 + valueFrom30599 + valueFrom30601 + valueFrom30447;
+                            diveLinker.setInput([
+                                { id: '477c82f179d14522b6fac6b8d8a61c79', value: valueFrom30448 },
+                                { id: 'd9aa94a1694044989f5783760838ee37', value: valueFrom30599 },
+                                { id: 'a1b4f57dbc7642b6b2d245c1cb77bb37', value: finalValue30447 }
+                            ]);
+                        } else if (currentProject === '30605') {
+                            const finalValue30605 = valueFrom30603 + valueFrom30602 + valueFrom30443 + valueFrom30605;
+                            diveLinker.setInput([
+                                { id: '3c9da4886fa84d07952e02e06f8a3870', value: valueFrom30603 },
+                                { id: 'a1b4f57dbc7642b6b2d245c1cb77bb37', value: valueFrom30602 },
+                                { id: '90899e0eef064729b27f41a1728eaa35', value: valueFrom30443 },
+                                { id: '23a59353accf442694adb5ff024b3eb3', value: finalValue30605 }
+                            ]);
+                        }
+                    }, 1000);
+                }
+            }
+        }
+
+        function updateFirebaseLearningStatus(status) {
+            if (userId) {
+                db.collection('users').doc(userId).update({
+                    learning: status
+                }).then(() => {
+                    console.log('Learning status updated successfully.');
+                }).catch((error) => {
+                    console.error('Error updating learning status: ', error);
+                });
+            }
+        }
+
+        // 定时检查项目完成状态并处理跳转逻辑
+        setInterval(() => {
+            checkAndSetNextProject();
+        }, 1000);
+
+        setProject('30590'); // 初始化设置第一个项目
     </script>
 </body>
 </html>
