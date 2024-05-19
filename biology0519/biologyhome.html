@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google-signin-client_id" content="130442278978-j29rl7r5srslikgar49cu0616e24icep.apps.googleusercontent.com">
+    <title>生物学學習平台</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header, footer {
+            background-color: #204051;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        h1 {
+            margin: 0;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #3b6978;
+            padding: 20px 0;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #84a9ac;
+            border: none;
+            color: white;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #cae8d5;
+        }
+        footer p {
+            margin: 0;
+            font-size: 0.8rem;
+        }
+        .introduction {
+            padding: 20px;
+            text-align: center;
+        }
+        .featured-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .logo {
+            display: block;
+            margin: 10px auto;
+            width: 80px;
+            animation: spin 20s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>生物学習平台</h1>
+        <img src="bernese.JPG" alt="学習平台Logo" class="logo">
+    </header>
+    <nav>
+        <button id="google-login-btn">使用 Google 帳號登錄</button>
+        <button id="logout-btn" style="display: none;">登出</button>
+        <ul>
+            <li><a href="biologylesson.html">課程學習</a></li>
+            <li><a href="biologyquiz.html">測驗</a></li>
+            <li><a href="videos.html">教学视频</a></li>
+            <li><a href='biologyprofile.html'>個人檔案</a></li>
+        </ul>
+    </nav>
+    <div class="introduction">
+        <h2>欢迎来到生物学习平台</h2>
+        <p>这里你可以学习到关于哺乳类和节肢动物的有趣知识。</p>
+        <div id="user-info"></div>
+    </div>
+    <img src="home.jpg" alt="Featured Animal" class="featured-image">
+    <footer>
+        <p>版权所有 © 生物学习平台</p>
+    </footer>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script> <!-- Ensure Firestore is included -->
+    <script>
+    var firebaseConfig = {
+        apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+        authDomain: "biologylearning-s11055013.firebaseapp.com",
+        databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
+        projectId: "biologylearning-s11055013",
+        storageBucket: "biologylearning-s11055013.appspot.com",
+        messagingSenderId: "743496923725",
+        appId: "1:743496923725:web:866adef56bd80b02d53a04"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    function saveUserData(user) {
+        firebase.firestore().collection('users').doc(user.uid).set({
+            username: user.displayName,
+            useremail: user.email
+        }, { merge: true })
+        .then(() => console.log("User data saved."))
+        .catch(error => console.error("Error saving user data: ", error));
+    }
+
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
+            document.getElementById('logout-btn').style.display = 'block';
+            document.getElementById('google-login-btn').style.display = 'none';
+            saveUserData(user);
+        } else {
+            document.getElementById('user-info').innerHTML = '';
+            document.getElementById('logout-btn').style.display = 'none';
+            document.getElementById('google-login-btn').style.display = 'block';
+        }
+    });
+
+    function signInWithGoogle() {
+        firebase.auth().signInWithPopup(provider).then(result => {
+            const user = result.user;
+            console.log('Signed in as: ' + user.displayName);
+            saveUserData(user);
+        }).catch(error => {
+            console.error('Sign in failed: ', error.code, error.message);
+        });
+    }
+
+    function signOut() {
+        firebase.auth().signOut().then(() => {
+            console.log('User signed out.');
+            document.getElementById('user-info').innerHTML = '';
+            document.getElementById('logout-btn').style.display = 'none';
+            document.getElementById('google-login-btn').style.display = 'block';
+        }).catch(error => {
+            console.error('Sign out Error', error);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('google-login-btn').addEventListener('click', signInWithGoogle);
+        document.getElementById('logout-btn').addEventListener('click', signOut);
+    });
+    </script>
+</body>
+</html>

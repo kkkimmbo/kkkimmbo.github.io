@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動物分類測驗 - 生物學習平台</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header, footer {
+            background-color: #204051;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #3b6978;
+            padding: 10px 20px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            margin: 0;
+        }
+        nav ul li {
+            margin-right: 20px;
+        }
+        nav ul li:last-child {
+            margin-right: 0;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #84a9ac;
+            border: none;
+            color: white;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #cae8d5;
+        }
+        #user-info {
+            color: white;
+            flex-grow: 1;
+            text-align: left;
+            padding-left: 20px;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .quiz-item {
+            background-color: #ffffff;
+            margin: 10px auto;
+            padding: 20px;
+            width: 80%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+        .quiz-item ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .quiz-item li {
+            margin-bottom: 5px;
+        }
+        footer p {
+            margin: 0;
+            font-size: 0.8rem;
+        }
+        #submit-btn {
+            margin-top: 20px;
+        }
+        .logo {
+            display: block;
+            margin: auto;
+            width: 80px;
+            animation: spin 20s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .selected-option {
+            background-color: #cae8d5; /* 選中選項的背景顏色 */
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>生物學習平台</h1>
+        <img src="bernese.JPG" alt="學習平台Logo" class="logo">
+    </header>
+    <nav>
+        <div id="user-info">未登录</div>
+        <ul>
+            <li><a href="biologyhome.html">首頁</a></li>
+            <li><a href="biologylesson.html">課程學習</a></li>
+            <li><a href="biologyquiz.html">測驗</a></li>
+            <li><a href="biologyvideos.html">教學视频</a></li>
+            <li><a href='biologyprofile.html'>個人檔案</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <h2>動物分類測驗</h2>
+        <div class="quiz-item">
+            <!-- 题目加载位置 -->
+        </div>
+        <button type="button" id="submit-btn" onclick="submitQuiz()">提交答案</button>
+    </div>
+    <footer>
+        <p>版權所有 © 生物學習平台</p>
+    </footer>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+            authDomain: "biologylearning-s11055013.firebaseapp.com",
+            projectId: "biologylearning-s11055013",
+            storageBucket: "biologylearning-s11055013.appspot.com",
+            messagingSenderId: "743496923725",
+            appId: "1:743496923725:web:866adef56bd80b02d53a04"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        var score = 0; // 存储用户的得分
+        var totalQuestions = 0; // 已加载的题目数量
+        var answersRecord = {};
+        var questionData = []; // 用于存储加载的题目信息
+
+        window.onload = () => {
+            loadQuestions();
+        };
+
+        function loadQuestions() {
+            db.collection("questions").limit(10).get().then(querySnapshot => {
+                let questions = [];
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    questions.push({ id: doc.id, ...data });
+                });
+                questions.sort(() => Math.random() - 0.5);
+                questionData = questions; // 保存问题数据
+                const questionsContainer = document.querySelector('.quiz-item');
+                questionsContainer.innerHTML = '';
+                questions.forEach((question, index) => {
+                    const questionHTML = `<div class='question'>
+                        <h3>${question.questions}</h3>
+                        <ul id='question-${index}'>
+                            ${['options', 'options2', 'options3', 'options4'].map(option => `
+                                <li><button onclick="selectAnswer(${index}, '${question[option]}', '${question.answers}', '${question.questions}', this)">${question[option]}</button></li>
+                            `).join('')}
+                        </ul>
+                    </div>`;
+                    questionsContainer.innerHTML += questionHTML;
+                });
+                totalQuestions = questions.length; // 设置问题总数
+            }).catch(error => {
+                console.error("加载题目时出错: ", error);
+            });
+        }
+
+        function submitQuiz() {
+            score = 0;
+            let wrongQuestions = [];
+            Object.keys(answersRecord).forEach(index => {
+                const answer = answersRecord[index];
+                if (answer.selectedOption === answer.correctAnswer) {
+                    score += 10;
+                } else {
+                    wrongQuestions.push({ question: answer.questionText, correctAnswer: answer.correctAnswer });
+                }
+            });
+
+            alert(`你的得分是: ${score} / ${totalQuestions * 10}`);
+            console.log(`Score calculated: ${score} out of ${totalQuestions * 10}`);
+
+            const user = firebase.auth().currentUser;
+            if (user) {
+                db.collection('users').doc(user.uid).set({
+                    score: score,
+                    wrongquestions: wrongQuestions
+                }, { merge: true })
+                .then(() => {
+                    console.log("Score and wrong questions updated successfully for user: " + user.uid);
+                })
+                .catch(error => {
+                    console.error("Error updating score and wrong questions for user: " + user.uid, error);
+                });
+            } else {
+                console.log("No user signed in to save score.");
+            }
+
+            score = 0; // Reset score for new quiz
+            loadQuestions(); // Optionally reload questions for a new quiz
+        }
+
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+                document.getElementById('logout-btn').style.display = 'inline';
+                document.getElementById('google-login-btn').style.display = 'none';
+            } else {
+                document.getElementById('user-info').textContent = '未登录';
+                document.getElementById('logout-btn').style.display = 'none';
+                document.getElementById('google-login-btn').style.display = 'inline';
+            }
+        });
+
+        function selectAnswer(questionIndex, selectedOption, correctAnswer, questionText, button) {
+            const questionUl = document.getElementById(`question-${questionIndex}`);
+            questionUl.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove('selected-option'); // Remove selected class from all buttons
+            });
+            button.classList.add('selected-option'); // Add class to the selected button
+            answersRecord[questionIndex] = { selectedOption, correctAnswer, questionText };
+        }
+    </script>
+</body>
+</html>

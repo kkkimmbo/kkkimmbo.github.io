@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程介紹 - 生物學習平台</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header, footer {
+            background-color: #204051;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #3b6978;
+            padding: 10px 20px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            margin: 0;
+        }
+        nav ul li {
+            margin-right: 20px;
+        }
+        nav ul li:last-child {
+            margin-right: 0;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #84a9ac;
+            border: none;
+            color: white;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #cae8d5;
+        }
+        #user-info {
+            color: white;
+            flex-grow: 1;
+            text-align: left;
+            padding-left: 20px;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .course-item {
+            background-color: #ffffff;
+            margin: 10px auto;
+            padding: 20px;
+            width: 80%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+        footer p {
+            margin: 0;
+            font-size: 0.8rem;
+        }
+        .logo {
+            display: block;
+            margin: auto;
+            width: 80px;
+            animation: spin 20s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>生物學習平台</h1>
+        <img src="bernese.JPG" alt="學習平台Logo" class="logo">
+    </header>
+    <nav>
+        <div id="user-info">未登录</div>
+        <ul>
+            <li><a href="biologyhome.html">首頁</a></li>
+            <li><a href="biologylesson.html">課程學習</a></li>
+            <li><a href="biologyquiz.html">測驗</a></li>
+            <li><a href="biologyvideos.html">教學视频</a></li>
+            <li><a href='biologyprofile.html'>個人檔案</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <h2>課程介紹</h2>
+        <div class="course-item">
+            <h3>課程內容</h3>
+            <p>探討哺乳類動物的基本特徵、生理構造及其生態習性。</p>
+            <iframe id="iframe_" src="https://dive.nutn.edu.tw/Experiment/kaleTestExperiment5.jsp?eid=30590&record=false" frameborder="0" name="dive1" width="100%" height="768px"></iframe>
+        </div>
+    </div>
+    <footer>
+        <p>版權所有 © 生物學習平台</p>
+    </footer>
+
+    <!-- 引入脚本 -->
+    <script src="https://dive.nutn.edu.tw/Experiment/js/dive.linker.js"></script>
+    <script src="IO.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    <script>
+        // Initialize Firebase
+        var firebaseConfig = {
+            apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+            authDomain: "biologylearning-s11055013.firebaseapp.com",
+            projectId: "biologylearning-s11055013",
+            storageBucket: "biologylearning-s11055013.appspot.com",
+            messagingSenderId: "743496923725",
+            appId: "1:743496923725:web:866adef56bd80b02d53a04"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // Handle authentication state changes
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+                document.getElementById('logout-btn').style.display = 'inline';
+                document.getElementById('google-login-btn').style.display = 'none';
+            } else {
+                document.getElementById('user-info').textContent = '未登录';
+                
+            }
+        });
+    </script>
+</body>
+</html>
+
+
