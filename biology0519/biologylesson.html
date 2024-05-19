@@ -120,7 +120,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
     <script>
-        // 初始化 Firebase
         var firebaseConfig = {
             apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
             authDomain: "biologylearning-s11055013.firebaseapp.com",
@@ -130,23 +129,41 @@
             appId: "1:743496923725:web:866adef56bd80b02d53a04"
         };
         firebase.initializeApp(firebaseConfig);
-        var db = firebase.firestore();
 
-        let userId = null;
-
-        // 处理身份验证状态变化
-        firebase.auth().onAuthStateChanged(function (user) {
+        var userId = null;
+        firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 userId = user.uid;
                 document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
+                saveUserData(user);
             } else {
-                userId = null;
                 document.getElementById('user-info').textContent = '未登录';
+                userId = null;
             }
         });
 
-        const diveLinker = new DiveLinker('dive1');
+        function saveUserData(user) {
+            firebase.firestore().collection('users').doc(user.uid).set({
+                username: user.displayName,
+                useremail: user.email
+            }, { merge: true })
+            .then(() => console.log("User data saved."))
+            .catch(error => console.error("Error saving user data: ", error));
+        }
 
+        function updateFirebaseLearningStatus(status) {
+            if (userId) {
+                firebase.firestore().collection('users').doc(userId).update({
+                    learning: status
+                }).then(() => {
+                    console.log('Learning status updated successfully.');
+                }).catch((error) => {
+                    console.error('Error updating learning status: ', error);
+                });
+            }
+        }
+
+        const diveLinker = new DiveLinker('dive1');
         let currentProject = '30590';
         let valueFrom30448 = 0;
         let valueFrom30603 = 0;
@@ -308,18 +325,6 @@
                         }
                     }, 1000);
                 }
-            }
-        }
-
-        function updateFirebaseLearningStatus(status) {
-            if (userId) {
-                db.collection('users').doc(userId).update({
-                    learning: status
-                }).then(() => {
-                    console.log('Learning status updated successfully.');
-                }).catch((error) => {
-                    console.error('Error updating learning status: ', error);
-                });
             }
         }
 
