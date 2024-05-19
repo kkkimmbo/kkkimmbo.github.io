@@ -115,6 +115,10 @@
             <p><strong>電子郵件：</strong><span id="email"></span></p>
             <p><strong>分數：</strong><span id="score"></span></p>
             <p><strong>答錯題目：</strong><div id="wrong-answers"></div></p>
+            <p><strong>哺乳動物、節肢動物測驗：</strong><span id="learning"></span></p>
+            <p><strong>分報名表單任務：</strong><span id="register"></span></p>
+            <p><strong>發送邀請函任務：</strong><span id="invitation"></span></p>
+            <p><strong>保護自然環境：</strong><span id="nature"></span></p>
         </div>
     </div>
     <footer>
@@ -157,9 +161,19 @@
                         wrongQuestionsDiv.innerHTML = wrongQuestions.map(q => 
                             `<div class="wrong-question"><strong>題目：</strong>${q.question}<br><strong>正確答案：</strong>${q.correctAnswer}</div>`
                         ).join("") || 'No mistakes recorded';
+
+                        // Display new fields
+                        document.getElementById('learning').textContent = userData.learning || 'No data yet';
+                        document.getElementById('register').textContent = userData.register || 'No data yet';
+                        document.getElementById('invitation').textContent = userData.invitation || 'No data yet';
+                        document.getElementById('nature').textContent = userData.nature || 'No data yet';
                     } else {
                         document.getElementById('score').textContent = 'No score yet';
                         document.getElementById('wrong-answers').textContent = 'No mistakes recorded';
+                        document.getElementById('learning').textContent = 'No data yet';
+                        document.getElementById('register').textContent = 'No data yet';
+                        document.getElementById('invitation').textContent = 'No data yet';
+                        document.getElementById('nature').textContent = 'No data yet';
                     }
                 }).catch(function(error) {
                     console.error("Error getting user data:", error);
@@ -170,9 +184,12 @@
                 document.getElementById('email').textContent = '';
                 document.getElementById('score').textContent = '';
                 document.getElementById('wrong-answers').textContent = '';
+                document.getElementById('learning').textContent = '';
+                document.getElementById('register').textContent = '';
+                document.getElementById('invitation').textContent = '';
+                document.getElementById('nature').textContent = '';
             }
         });
     </script>
-    
 </body>
 </html>
