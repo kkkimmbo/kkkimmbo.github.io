@@ -112,7 +112,8 @@ function getNextStage() {
 }
 
 function sendMessageToParent(message) {
-    window.parent.postMessage(message, 'https://dive.nutn.edu.tw'); // 請確保這個URL是你父頁面的URL
+    console.log("Sending message to parent:", message);
+    window.parent.postMessage(message, '*'); // 使用 '*' 確保消息可以被父頁面接收
 }
 
 function checkAndSetNextProject() {
