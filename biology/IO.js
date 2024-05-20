@@ -160,50 +160,57 @@ function checkAndSetNextProject() {
                 // 顯示相關訊息
                 if (currentProject === '30448') {
                     sendMessageToParent({
-                        type: 'updateStatus',
+                        type: 'updateFirebaseStatus',
                         status: '已完成哺乳類動物影片觀看'
+                        field: 'mammalsvideo'
                     });
                 }
 
                 if (currentProject === '30603') {
                     sendMessageToParent({
-                        type: 'updateStatus',
+                        type: 'updateFirebaseStatus',
                         status: '已完成節肢類動物影片觀看'
+                        field: 'arthropodsvideo'
                     });
                 }
 
                 if (currentProject === '30670') {
                     sendMessageToParent({
-                        type: 'updateStatus',
+                        type: 'updateFirebaseStatus',
                         status: '完成哺乳動物、節肢動物測驗'
+                        field: 'learning'
                     });
                 }
 
                 if (currentProject === '30617') {
                     sendMessageToParent({
-                        type: 'updateStatus',
+                        type: 'updateFirebaseStatus',
                         status: '已完成協助分報名表單任務'
+                        field: 'register'
                     });
                 }
 
                 if (currentProject === '30634') {
                     sendMessageToParent({
-                        type: 'updateStatus',
+                        type: 'updateFirebaseStatus',
                         status: '已完成協助發送邀請函任務'
+                        field: 'invitation'
                     });
                 }
 
                 if (currentProject === '30643') {
                     sendMessageToParent({
-                        type: 'updateStatus',
+                        type: 'updateFirebaseStatus',
                         status: '守護了自然環境！'
+                        field: 'nature'
                     });
                 }
 
                 if (currentProject === '30645') {
                     sendMessageToParent({
-                        type: 'updateStatus',
+                        type: 'updateFirebaseStatus',
                         status: '已呼籲守護自然環境的重要！'
+                        field: 'nature'
                     });
                 }
 
