@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>個人信息 - 生物學習平台</title>
+    <title>個人訊息 - 生物學習平台</title>
     <style>
         body, h1, h2, p {
             margin: 0;
@@ -69,15 +69,25 @@
             margin: 10px auto;
             padding: 20px;
             width: 80%;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            text-align: left;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
             font-size: 1.1rem;
         }
-        .user-info p {
-            margin: 10px 0;
+        .user-info table {
+            width: 100%;
+            border-collapse: collapse;
         }
-        .user-info p strong {
+        .user-info th, .user-info td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .user-info th {
+            background-color: #f2f2f2;
             color: #204051;
+        }
+        .user-info td {
+            font-size: 1rem;
         }
         footer p {
             font-size: 0.8rem;
@@ -114,18 +124,50 @@
         </ul>
     </nav>
     <div class="content">
-        <h2>個人信息</h2>
+        <h2>個人訊息</h2>
         <div class="user-info">
-            <p><strong>姓名：</strong><span id="display-name"></span></p>
-            <p><strong>電子郵件：</strong><span id="email"></span></p>
-            <p><strong>哺乳類教學影片：</strong><span id="mammalsvideo"></span></p>
-            <p><strong>節肢動物類教學影片：</strong><span id="arthropodsvideo"></span></p>
-            <p><strong>哺乳動物、節肢動物測驗：</strong><span id="learning"></span></p>
-            <p><strong>分報名表單任務：</strong><span id="register"></span></p>
-            <p><strong>發送邀請函任務：</strong><span id="invitation"></span></p>
-            <p><strong>保護自然環境：</strong><span id="nature"></span></p>
-            <p><strong>分數：</strong><span id="score"></span></p>
-            <p><strong>答錯題目：</strong><div id="wrong-answers"></div></p>
+            <table>
+                <tr>
+                    <th>姓名</th>
+                    <td><span id="display-name"></span></td>
+                </tr>
+                <tr>
+                    <th>電子郵件</th>
+                    <td><span id="email"></span></td>
+                </tr>
+                <tr>
+                    <th>哺乳類教學影片</th>
+                    <td><span id="mammalsvideo"></span></td>
+                </tr>
+                <tr>
+                    <th>節肢動物類教學影片</th>
+                    <td><span id="arthropodsvideo"></span></td>
+                </tr>
+                <tr>
+                    <th>哺乳動物、節肢動物測驗</th>
+                    <td><span id="learning"></span></td>
+                </tr>
+                <tr>
+                    <th>分報名表單任務</th>
+                    <td><span id="register"></span></td>
+                </tr>
+                <tr>
+                    <th>發送邀請函任務</th>
+                    <td><span id="invitation"></span></td>
+                </tr>
+                <tr>
+                    <th>保護自然環境</th>
+                    <td><span id="nature"></span></td>
+                </tr>
+                <tr>
+                    <th>分數</th>
+                    <td><span id="score"></span></td>
+                </tr>
+                <tr>
+                    <th>答錯題目</th>
+                    <td><div id="wrong-answers"></div></td>
+                </tr>
+            </table>
         </div>
     </div>
     <footer>
