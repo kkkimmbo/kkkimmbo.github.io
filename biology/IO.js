@@ -59,16 +59,28 @@ function getNextStage() {
         valueFrom30605 = parseInt(diveLinker.getAttr('23a59353accf442694adb5ff024b3eb3'));
         return '30410';
     } else if (currentProject === '30414') {
-        valueFrom30414 = parseInt(diveLinker.getAttr('5f7d12ea2145450eab69b9b79630d03c'));
-        return null; // Wait for 30410 to complete
-    } else if (currentProject === '30410') {
-        valueFrom30410 = parseInt(diveLinker.getAttr('0afc0f39c48a453cb1fd32d5d11ae4da'));
+        const outputValue30414 = parseInt(diveLinker.getAttr('5f7d12ea2145450eab69b9b79630d03c'));
+        valueFrom30414 = outputValue30414 + valueFrom30448 + valueFrom30599 + valueFrom30601 + valueFrom30447;
+
         if (valueFrom30414 > 80 && valueFrom30410 > 80) {
             return '30670';
         } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
             return '30595';
         } else if (valueFrom30414 <= 80 && valueFrom30410 > 80) {
             return '30594';
+        } else {
+            return Math.random() < 0.5 ? '30594' : '30595';
+        }
+    } else if (currentProject === '30410') {
+        const outputValue30410 = parseInt(diveLinker.getAttr('0afc0f39c48a453cb1fd32d5d11ae4da'));
+        valueFrom30410 = outputValue30410 + valueFrom30603 + valueFrom30602 + valueFrom30443 + valueFrom30605;
+
+        if (valueFrom30414 > 80 && valueFrom30410 > 80) {
+            return '30670';
+        } else if (valueFrom30414 <= 80 && valueFrom30410 > 80) {
+            return '30594';
+        } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
+            return '30595';
         } else {
             return Math.random() < 0.5 ? '30594' : '30595';
         }
@@ -146,37 +158,21 @@ function checkAndSetNextProject() {
                 }
 
                 // 檢查專案30594的完成狀態並更新Firebase狀態
-                if (currentProject === '30594') {
-                    if (diveLinker.checkComplete()) {
-                        sendMessageToParent({
-                            type: 'updateFirebaseStatus',
-                            status: '已完成哺乳類動物影片觀看',
-                            field: 'mammalsvideo'
-                        });
-                    } else {
-                        sendMessageToParent({
-                            type: 'updateFirebaseStatus',
-                            status: '未完成哺乳類動物影片觀看',
-                            field: 'mammalsvideo'
-                        });
-                    }
+                if (currentProject === '30594' && diveLinker.checkComplete()) {
+                    sendMessageToParent({
+                        type: 'updateFirebaseStatus',
+                        status: '已完成哺乳類動物影片觀看',
+                        field: 'mammalsvideo'
+                    });
                 }
 
                 // 檢查專案30595的完成狀態並更新Firebase狀態
-                if (currentProject === '30595') {
-                    if (diveLinker.checkComplete()) {
-                        sendMessageToParent({
-                            type: 'updateFirebaseStatus',
-                            status: '已完成節肢類動物影片觀看',
-                            field: 'arthropodsvideo'
-                        });
-                    } else {
-                        sendMessageToParent({
-                            type: 'updateFirebaseStatus',
-                            status: '未完成節肢類動物影片觀看',
-                            field: 'arthropodsvideo'
-                        });
-                    }
+                if (currentProject === '30595' && diveLinker.checkComplete()) {
+                    sendMessageToParent({
+                        type: 'updateFirebaseStatus',
+                        status: '已完成節肢類動物影片觀看',
+                        field: 'arthropodsvideo'
+                    });
                 }
 
                 // 判斷專案30414和30410的輸出值
@@ -184,23 +180,34 @@ function checkAndSetNextProject() {
                     const value30414 = parseInt(diveLinker.getAttr('5f7d12ea2145450eab69b9b79630d03c'));
                     const value30410 = parseInt(diveLinker.getAttr('0afc0f39c48a453cb1fd32d5d11ae4da'));
 
-                    if (value30414 <= 80 || value30410 <= 80) {
+                    if (value30414 > 80 && value30410 > 80) {
+                        sendMessageToParent({
+                            type: 'updateFirebaseStatus',
+                            status: '完成哺乳動物、節肢動物測驗',
+                            field: 'learning'
+                        });
+                    } else if (value30414 > 80 && value30410 <= 80) {
+                        sendMessageToParent({
+                            type: 'updateFirebaseStatus',
+                            status: '僅完成哺乳類動物測驗',
+                            field: 'learning'
+                        });
+                    } else if (value30414 <= 80 && value30410 > 80) {
+                        sendMessageToParent({
+                            type: 'updateFirebaseStatus',
+                            status: '僅完成節肢動物類測驗',
+                            field: 'learning'
+                        });
+                    } else {
                         sendMessageToParent({
                             type: 'updateFirebaseStatus',
                             status: '未完成哺乳動物、節肢動物測驗',
                             field: 'learning'
                         });
-                    } else {
-                        const learningStatus = getLearningStatus(value30414, value30410);
-                        sendMessageToParent({
-                            type: 'updateFirebaseStatus',
-                            status: learningStatus,
-                            field: 'learning'
-                        });
                     }
                 }
 
-                // 檢查專案30670的輸出值
+                // 檢查專案30670的輸出值並更新Firebase狀態
                 if (currentProject === '30670') {
                     const outputValue30670 = parseInt(diveLinker.getAttr('ea3149c1a213403d91e83a0d83a88a07'));
                     const registerStatus = outputValue30670 === 1 ? '已完成協助分報名表單任務' : '未完成協助分報名表單任務';
@@ -211,6 +218,7 @@ function checkAndSetNextProject() {
                     });
                 }
 
+                // 檢查專案30625的輸出值並更新Firebase狀態
                 if (currentProject === '30625') {
                     const outputValue30625 = parseInt(diveLinker.getAttr('522a12e421de43f8be907eebba83c00a'));
                     const invitationStatus = outputValue30625 === 1 ? '已完成協助發送邀請函任務' : '未完成協助發送邀請函任務';
@@ -221,6 +229,7 @@ function checkAndSetNextProject() {
                     });
                 }
 
+                // 檢查專案30634的輸出值並更新Firebase狀態
                 if (currentProject === '30634') {
                     const outputValue30634 = parseInt(diveLinker.getAttr('9c8ab52b37cd40a7ac8cfa477b29c51d'));
                     const natureStatus = outputValue30634 === 1 ? '守護了自然環境！' : '已呼籲守護自然環境的重要！';
@@ -235,21 +244,9 @@ function checkAndSetNextProject() {
     }
 }
 
-function getLearningStatus(value30414, value30410) {
-    if (value30414 > 80 && value30410 > 80) {
-        return '完成哺乳動物、節肢動物測驗';
-    } else if (value30414 > 80 && value30410 <= 80) {
-        return '僅完成哺乳類動物測驗';
-    } else if (value30414 <= 80 && value30410 > 80) {
-        return '僅完成節肢動物類測驗';
-    } else {
-        return '未完成哺乳動物、節肢動物測驗';
-    }
-}
-
 // 定时检查项目完成状态并处理跳转逻辑
 setInterval(() => {
     checkAndSetNextProject();
 }, 1000);
 
-setProject('30590'); // 初始化设置第一个项目。
+setProject('30590'); // 初始化设置第一个项目
