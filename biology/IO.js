@@ -60,10 +60,18 @@ function getNextStage() {
         return '30410';
     } else if (currentProject === '30414') {
         valueFrom30414 = parseInt(diveLinker.getAttr('5f7d12ea2145450eab69b9b79630d03c'));
-        return '30670';
+        return null; // Wait for 30410 to complete
     } else if (currentProject === '30410') {
         valueFrom30410 = parseInt(diveLinker.getAttr('0afc0f39c48a453cb1fd32d5d11ae4da'));
-        return '30670';
+        if (valueFrom30414 > 80 && valueFrom30410 > 80) {
+            return '30670';
+        } else if (valueFrom30414 > 80 && valueFrom30410 <= 80) {
+            return '30595';
+        } else if (valueFrom30414 <= 80 && valueFrom30410 > 80) {
+            return '30594';
+        } else {
+            return Math.random() < 0.5 ? '30594' : '30595';
+        }
     } else if (currentProject === '30670') {
         const outputValue30670 = parseInt(diveLinker.getAttr('ea3149c1a213403d91e83a0d83a88a07'));
         if (outputValue30670 === 1) {
@@ -176,7 +184,7 @@ function checkAndSetNextProject() {
                     const value30414 = parseInt(diveLinker.getAttr('5f7d12ea2145450eab69b9b79630d03c'));
                     const value30410 = parseInt(diveLinker.getAttr('0afc0f39c48a453cb1fd32d5d11ae4da'));
 
-                    if (!diveLinker.checkComplete()) {
+                    if (value30414 <= 80 || value30410 <= 80) {
                         sendMessageToParent({
                             type: 'updateFirebaseStatus',
                             status: '未完成哺乳動物、節肢動物測驗',
