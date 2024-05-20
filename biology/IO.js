@@ -22,8 +22,8 @@ function getNextStage() {
     if (currentProject === '30590') {
         return '30699';
     } else if (currentProject === '30699') {
-        const mammalsOutput = diveLinker.getAttr('acf3f141f237480aa6348f33746694ef');
-        const arthropodsOutput = diveLinker.getAttr('3207de6f8b8e47a98aebfaaedd084118');
+        const mammalsOutput = parseInt(diveLinker.getAttr('acf3f141f237480aa6348f33746694ef'));
+        const arthropodsOutput = parseInt(diveLinker.getAttr('3207de6f8b8e47a98aebfaaedd084118'));
 
         if (mammalsOutput === 1) {
             return '30594';
