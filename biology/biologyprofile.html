@@ -10,6 +10,9 @@
             padding: 0;
             font-family: Arial, sans-serif;
         }
+        body {
+            background-color: #f4f4f9;
+        }
         header, footer {
             background-color: #204051;
             color: white;
@@ -61,18 +64,20 @@
             padding: 20px;
             text-align: center;
         }
-        .course-item {
+        .user-info {
             background-color: #ffffff;
             margin: 10px auto;
             padding: 20px;
             width: 80%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .course-item h3 {
-            color: #204051;
-        }
-        .course-item p {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             text-align: left;
+            font-size: 1.1rem;
+        }
+        .user-info p {
+            margin: 10px 0;
+        }
+        .user-info p strong {
+            color: #204051;
         }
         footer p {
             font-size: 0.8rem;
@@ -99,26 +104,28 @@
         <img src="bernese.JPG" alt="學習平台Logo" class="logo">
     </header>
     <nav>
-        <div id="user-info">未登录</div>
+        <div id="user-info">未登入</div>
         <ul>
             <li><a href="biologyhome.html">首頁</a></li>
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
-            <li><a href="biologyvideos.html">教学视频</a></li>
-            <li><a href='biologyprofile.html'>個人檔案</a></li>
+            <li><a href="biologyvideos.html">教學影片</a></li>
+            <li><a href="biologyprofile.html">個人檔案</a></li>
         </ul>
     </nav>
     <div class="content">
         <h2>個人信息</h2>
-        <div>
+        <div class="user-info">
             <p><strong>姓名：</strong><span id="display-name"></span></p>
             <p><strong>電子郵件：</strong><span id="email"></span></p>
-            <p><strong>分數：</strong><span id="score"></span></p>
-            <p><strong>答錯題目：</strong><div id="wrong-answers"></div></p>
+            <p><strong>哺乳類教學影片：</strong><span id="mammalsvideo"></span></p>
+            <p><strong>節肢動物類教學影片：</strong><span id="arthropodsvideo"></span></p>
             <p><strong>哺乳動物、節肢動物測驗：</strong><span id="learning"></span></p>
             <p><strong>分報名表單任務：</strong><span id="register"></span></p>
             <p><strong>發送邀請函任務：</strong><span id="invitation"></span></p>
             <p><strong>保護自然環境：</strong><span id="nature"></span></p>
+            <p><strong>分數：</strong><span id="score"></span></p>
+            <p><strong>答錯題目：</strong><div id="wrong-answers"></div></p>
         </div>
     </div>
     <footer>
@@ -140,12 +147,12 @@
         };
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-    
+
         var provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({
             prompt: 'select_account'
         });
-    
+
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 document.getElementById('user-info').textContent = 'Hello, ' + user.displayName;
@@ -154,32 +161,35 @@
                 firebase.firestore().collection('users').doc(user.uid).get().then(function(doc) {
                     if (doc.exists) {
                         const userData = doc.data();
-                        document.getElementById('score').textContent = userData.score || 'No score yet';
-                        // New logic to display wrong answers
+                        document.getElementById('score').textContent = userData.score || '未進行題庫測驗';
                         const wrongQuestions = userData.wrongquestions || [];
                         const wrongQuestionsDiv = document.getElementById('wrong-answers');
                         wrongQuestionsDiv.innerHTML = wrongQuestions.map(q => 
                             `<div class="wrong-question"><strong>題目：</strong>${q.question}<br><strong>正確答案：</strong>${q.correctAnswer}</div>`
-                        ).join("") || 'No mistakes recorded';
+                        ).join("") || '尚無資料';
 
                         // Display new fields
-                        document.getElementById('learning').textContent = userData.learning || 'No data yet';
-                        document.getElementById('register').textContent = userData.register || 'No data yet';
-                        document.getElementById('invitation').textContent = userData.invitation || 'No data yet';
-                        document.getElementById('nature').textContent = userData.nature || 'No data yet';
+                        document.getElementById('learning').textContent = userData.learning || '未完成哺乳動物、節肢動物類測驗';
+                        document.getElementById('register').textContent = userData.register || '未完成協助分類報名表單任務';
+                        document.getElementById('invitation').textContent = userData.invitation || '未完成協助發送邀請函任務';
+                        document.getElementById('nature').textContent = userData.nature || '未進行達成協議表決';
+                        document.getElementById('mammalsvideo').textContent = userData.mammalsvideo || '未觀看哺乳動物教學影片';
+                        document.getElementById('arthropodsvideo').textContent = userData.arthropodsvideo || '未觀看節肢動物教學影片';
                     } else {
-                        document.getElementById('score').textContent = 'No score yet';
-                        document.getElementById('wrong-answers').textContent = 'No mistakes recorded';
-                        document.getElementById('learning').textContent = 'No data yet';
-                        document.getElementById('register').textContent = 'No data yet';
-                        document.getElementById('invitation').textContent = 'No data yet';
-                        document.getElementById('nature').textContent = 'No data yet';
+                        document.getElementById('score').textContent = '未進行題庫測驗';
+                        document.getElementById('wrong-answers').textContent = '尚無資料';
+                        document.getElementById('learning').textContent = '未完成哺乳動物、節肢動物類測驗';
+                        document.getElementById('register').textContent = '未完成協助分類報名表單任務';
+                        document.getElementById('invitation').textContent = '未完成協助發送邀請函任務';
+                        document.getElementById('nature').textContent = '未進行達成協議表決';
+                        document.getElementById('mammalsvideo').textContent = '未觀看哺乳動物教學影片';
+                        document.getElementById('arthropodsvideo').textContent = '未觀看節肢動物教學影片';
                     }
                 }).catch(function(error) {
                     console.error("Error getting user data:", error);
                 });
             } else {
-                document.getElementById('user-info').textContent = '未登录';
+                document.getElementById('user-info').textContent = '未登入';
                 document.getElementById('display-name').textContent = '';
                 document.getElementById('email').textContent = '';
                 document.getElementById('score').textContent = '';
@@ -188,6 +198,8 @@
                 document.getElementById('register').textContent = '';
                 document.getElementById('invitation').textContent = '';
                 document.getElementById('nature').textContent = '';
+                document.getElementById('mammalsvideo').textContent = '';
+                document.getElementById('arthropodsvideo').textContent = '';
             }
         });
     </script>
