@@ -157,88 +157,56 @@ function checkAndSetNextProject() {
                     ]);
                 }
 
-                // 檢查專案30594的完成狀態並更新Firebase狀態
-                if (currentProject === '30594' && diveLinker.checkComplete()) {
+                // 顯示相關訊息
+                if (currentProject === '30448') {
                     sendMessageToParent({
-                        type: 'updateFirebaseStatus',
-                        status: '已完成哺乳類動物影片觀看',
-                        field: 'mammalsvideo'
+                        type: 'updateStatus',
+                        status: '已完成哺乳類動物影片觀看'
                     });
                 }
 
-                // 檢查專案30595的完成狀態並更新Firebase狀態
-                if (currentProject === '30595' && diveLinker.checkComplete()) {
+                if (currentProject === '30603') {
                     sendMessageToParent({
-                        type: 'updateFirebaseStatus',
-                        status: '已完成節肢類動物影片觀看',
-                        field: 'arthropodsvideo'
+                        type: 'updateStatus',
+                        status: '已完成節肢類動物影片觀看'
                     });
                 }
 
-                // 判斷專案30414和30410的輸出值
-                if (currentProject === '30414' || currentProject === '30410') {
-                    const value30414 = parseInt(diveLinker.getAttr('5f7d12ea2145450eab69b9b79630d03c'));
-                    const value30410 = parseInt(diveLinker.getAttr('0afc0f39c48a453cb1fd32d5d11ae4da'));
-
-                    if (value30414 > 80 && value30410 > 80) {
-                        sendMessageToParent({
-                            type: 'updateFirebaseStatus',
-                            status: '完成哺乳動物、節肢動物測驗',
-                            field: 'learning'
-                        });
-                    } else if (value30414 > 80 && value30410 <= 80) {
-                        sendMessageToParent({
-                            type: 'updateFirebaseStatus',
-                            status: '僅完成哺乳類動物測驗',
-                            field: 'learning'
-                        });
-                    } else if (value30414 <= 80 && value30410 > 80) {
-                        sendMessageToParent({
-                            type: 'updateFirebaseStatus',
-                            status: '僅完成節肢動物類測驗',
-                            field: 'learning'
-                        });
-                    } else {
-                        sendMessageToParent({
-                            type: 'updateFirebaseStatus',
-                            status: '未完成哺乳動物、節肢動物測驗',
-                            field: 'learning'
-                        });
-                    }
-                }
-
-                // 檢查專案30670的輸出值並更新Firebase狀態
                 if (currentProject === '30670') {
-                    const outputValue30670 = parseInt(diveLinker.getAttr('ea3149c1a213403d91e83a0d83a88a07'));
-                    const registerStatus = outputValue30670 === 1 ? '已完成協助分報名表單任務' : '未完成協助分報名表單任務';
                     sendMessageToParent({
-                        type: 'updateFirebaseStatus',
-                        status: registerStatus,
-                        field: 'register'
+                        type: 'updateStatus',
+                        status: '完成哺乳動物、節肢動物測驗'
                     });
                 }
 
-                // 檢查專案30625的輸出值並更新Firebase狀態
-                if (currentProject === '30625') {
-                    const outputValue30625 = parseInt(diveLinker.getAttr('522a12e421de43f8be907eebba83c00a'));
-                    const invitationStatus = outputValue30625 === 1 ? '已完成協助發送邀請函任務' : '未完成協助發送邀請函任務';
+                if (currentProject === '30617') {
                     sendMessageToParent({
-                        type: 'updateFirebaseStatus',
-                        status: invitationStatus,
-                        field: 'invitation'
+                        type: 'updateStatus',
+                        status: '已完成協助分報名表單任務'
                     });
                 }
 
-                // 檢查專案30634的輸出值並更新Firebase狀態
                 if (currentProject === '30634') {
-                    const outputValue30634 = parseInt(diveLinker.getAttr('9c8ab52b37cd40a7ac8cfa477b29c51d'));
-                    const natureStatus = outputValue30634 === 1 ? '守護了自然環境！' : '已呼籲守護自然環境的重要！';
                     sendMessageToParent({
-                        type: 'updateFirebaseStatus',
-                        status: natureStatus,
-                        field: 'nature'
+                        type: 'updateStatus',
+                        status: '已完成協助發送邀請函任務'
                     });
                 }
+
+                if (currentProject === '30643') {
+                    sendMessageToParent({
+                        type: 'updateStatus',
+                        status: '守護了自然環境！'
+                    });
+                }
+
+                if (currentProject === '30645') {
+                    sendMessageToParent({
+                        type: 'updateStatus',
+                        status: '已呼籲守護自然環境的重要！'
+                    });
+                }
+
             }, 1000);
         }
     }
