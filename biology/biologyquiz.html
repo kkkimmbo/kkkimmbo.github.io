@@ -309,7 +309,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer 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 `
+                        'Authorization': `Bearer sk-proj-rLUpaViovTEyi3Q4jXQuT3BlbkFJNMPEf9rxYdnu3uaJV0lo`
                     },
                     body: JSON.stringify({
                         model: "gpt-3.5-turbo",
@@ -322,6 +322,9 @@
                     if (response.status === 429) {
                         console.error('Too Many Requests: Please wait before making more requests.');
                         addMessage('bot', 'Too many requests, please wait and try again later.');
+                    } else if (response.status === 401) {
+                        console.error('Unauthorized: Please check your API key.');
+                        addMessage('bot', 'Unauthorized: Please check your API key.');
                     } else {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
