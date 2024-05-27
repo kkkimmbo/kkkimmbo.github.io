@@ -98,6 +98,60 @@
             background-color: #cae8d5; /* 選中選項的背景顏色 */
             color: white;
         }
+        .chat-container {
+            position: fixed;
+            bottom: 0;
+            right: 20px;
+            width: 300px;
+            max-height: 400px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-header {
+            background-color: #204051;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+        }
+        .chat-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .chat-footer {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+        .chat-footer input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .chat-footer button {
+            margin-left: 10px;
+            padding: 10px;
+            background-color: #204051;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .chat-message {
+            margin: 5px 0;
+        }
+        .chat-message.user {
+            text-align: right;
+        }
+        .chat-message.bot {
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -106,12 +160,12 @@
         <img src="bernese.JPG" alt="學習平台Logo" class="logo">
     </header>
     <nav>
-        <div id="user-info">未登入</div>
+        <div id="user-info">未登录</div>
         <ul>
             <li><a href="biologyhome.html">首頁</a></li>
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
-            <li><a href="biologyvideos.html">教學影片</a></li>
+            <li><a href="biologyvideos.html">教學视频</a></li>
             <li><a href='biologyprofile.html'>個人檔案</a></li>
         </ul>
     </nav>
@@ -121,6 +175,14 @@
             <!-- 题目加载位置 -->
         </div>
         <button type="button" id="submit-btn" onclick="submitQuiz()">提交答案</button>
+        <div class="chat-container">
+            <div class="chat-header">ChatGPT</div>
+            <div class="chat-body" id="chat-body"></div>
+            <div class="chat-footer">
+                <input type="text" id="chat-input" placeholder="輸入消息...">
+                <button onclick="sendMessage()">發送</button>
+            </div>
+        </div>
     </div>
     <footer>
         <p>版權所有 © 生物學習平台</p>
@@ -128,6 +190,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
@@ -218,7 +281,7 @@
                 document.getElementById('logout-btn').style.display = 'inline';
                 document.getElementById('google-login-btn').style.display = 'none';
             } else {
-                document.getElementById('user-info').textContent = '未登录';
+                document.getElementById('user-info').textContent = '未登入';
                 document.getElementById('logout-btn').style.display = 'none';
                 document.getElementById('google-login-btn').style.display = 'inline';
             }
@@ -231,6 +294,41 @@
             });
             button.classList.add('selected-option'); // Add class to the selected button
             answersRecord[questionIndex] = { selectedOption, correctAnswer, questionText };
+        }
+
+        async function sendMessage() {
+            const inputElement = document.getElementById('chat-input');
+            const message = inputElement.value;
+            if (message.trim() === '') return;
+
+            addMessage('user', message);
+            inputElement.value = '';
+
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer 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 `
+                },
+                body: JSON.stringify({
+                    model: "gpt-3.5-turbo",
+                    messages: [{ role: "user", content: message }],
+                    max_tokens: 150
+                })
+            });
+
+            const data = await response.json();
+            const botMessage = data.choices[0].message.content.trim();
+            addMessage('bot', botMessage);
+        }
+
+        function addMessage(sender, text) {
+            const chatBody = document.getElementById('chat-body');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message', sender);
+            messageElement.innerText = text;
+            chatBody.appendChild(messageElement);
+            chatBody.scrollTop = chatBody.scrollHeight;
         }
     </script>
 </body>
