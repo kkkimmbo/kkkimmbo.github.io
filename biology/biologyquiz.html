@@ -304,22 +304,31 @@
             addMessage('user', message);
             inputElement.value = '';
 
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer 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 `
-                },
-                body: JSON.stringify({
-                    model: "gpt-3.5-turbo",
-                    messages: [{ role: "user", content: message }],
-                    max_tokens: 150
-                })
-            });
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer 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 `
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-3.5-turbo",
+                        messages: [{ role: "user", content: message }],
+                        max_tokens: 150
+                    })
+                });
 
-            const data = await response.json();
-            const botMessage = data.choices[0].message.content.trim();
-            addMessage('bot', botMessage);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const botMessage = data.choices[0].message.content.trim();
+                addMessage('bot', botMessage);
+            } catch (error) {
+                console.error('Error during fetch:', error);
+                addMessage('bot', 'Sorry, something went wrong. Please try again later.');
+            }
         }
 
         function addMessage(sender, text) {
