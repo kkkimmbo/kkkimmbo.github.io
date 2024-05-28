@@ -73,12 +73,29 @@
             width: 80px;
             animation: spin 20s linear infinite;
         }
+        .comments-section {
+            padding: 20px;
+        }
+        .comment {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .comment-user {
+            font-weight: bold;
+        }
+        .like-btn {
+            cursor: pointer;
+            color: #007BFF;
+        }
+        .like-btn:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <header>
         <h1>生物學習平台</h1>
-        <img src="bernese.JPG" alt="学習平台Logo" class="logo">
+        <img src="bernese.JPG" alt="學習平台Logo" class="logo">
     </header>
     <nav>
         <button id="google-login-btn">使用 Google 帳號登入</button>
@@ -87,7 +104,7 @@
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
             <li><a href="videos.html">教學影片</a></li>
-            <li><a href='biologyprofile.html'>個人檔案</a></li>
+            <li><a href="biologyprofile.html">個人檔案</a></li>
         </ul>
     </nav>
     <div class="introduction">
@@ -96,12 +113,18 @@
         <div id="user-info"></div>
     </div>
     <img src="home.jpg" alt="Featured Animal" class="featured-image">
+    <div class="comments-section">
+        <h3>留言區</h3>
+        <div id="comments"></div>
+        <textarea id="comment-input" placeholder="發表你的留言..."></textarea>
+        <button id="post-comment-btn">發表留言</button>
+    </div>
     <footer>
         <p>版權所有 © 生物學習平台</p>
     </footer>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script> <!-- Ensure Firestore is included -->
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
     <script>
     var firebaseConfig = {
         apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
@@ -125,12 +148,65 @@
         .catch(error => console.error("Error saving user data: ", error));
     }
 
+    function postComment(uid, name, text) {
+        let newCommentKey = firebase.firestore().collection('comments').doc().id;
+        let commentData = {
+            uid: uid,
+            name: name,
+            text: text,
+            likes: 0,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        firebase.firestore().collection('comments').doc(newCommentKey).set(commentData)
+        .then(() => {
+            console.log("Comment posted.");
+            loadComments();
+        })
+        .catch(error => console.error("Error posting comment: ", error));
+    }
+
+    function loadComments() {
+        firebase.firestore().collection('comments').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+            let commentsDiv = document.getElementById('comments');
+            commentsDiv.innerHTML = '';
+            snapshot.forEach(doc => {
+                let comment = doc.data();
+                let commentElement = document.createElement('div');
+                commentElement.className = 'comment';
+                commentElement.innerHTML = `
+                    <p class="comment-user">${comment.name}</p>
+                    <p>${comment.text}</p>
+                    <p><span class="like-btn" data-key="${doc.id}" data-likes="${comment.likes}">讚 (${comment.likes})</span></p>
+                `;
+                commentsDiv.appendChild(commentElement);
+            });
+            attachLikeEvents();
+        });
+    }
+
+    function attachLikeEvents() {
+        let likeButtons = document.querySelectorAll('.like-btn');
+        likeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                let commentKey = button.getAttribute('data-key');
+                let likes = parseInt(button.getAttribute('data-likes'));
+                let newLikes = likes + 1;
+                firebase.firestore().collection('comments').doc(commentKey).update({ likes: newLikes })
+                .then(() => {
+                    console.log("Like updated.");
+                })
+                .catch(error => console.error("Error updating like: ", error));
+            });
+        });
+    }
+
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
             document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
             document.getElementById('logout-btn').style.display = 'block';
             document.getElementById('google-login-btn').style.display = 'none';
             saveUserData(user);
+            loadComments();
         } else {
             document.getElementById('user-info').innerHTML = '';
             document.getElementById('logout-btn').style.display = 'none';
@@ -162,6 +238,18 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('google-login-btn').addEventListener('click', signInWithGoogle);
         document.getElementById('logout-btn').addEventListener('click', signOut);
+        document.getElementById('post-comment-btn').addEventListener('click', () => {
+            if (firebase.auth().currentUser) {
+                let commentText = document.getElementById('comment-input').value;
+                if (commentText.trim() !== "") {
+                    let user = firebase.auth().currentUser;
+                    postComment(user.uid, user.displayName, commentText);
+                    document.getElementById('comment-input').value = '';
+                }
+            } else {
+                alert("請先使用 Google 登錄後再發表留言。");
+            }
+        });
     });
     </script>
 </body>
