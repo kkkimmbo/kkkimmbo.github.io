@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="130442278978-j29rl7r5srslikgar49cu0616e24icep.apps.googleusercontent.com">
     <title>生物學習平台</title>
     <style>
         body {
@@ -11,41 +11,34 @@
             padding: 0;
             background-color: #f4f4f9;
         }
-
         header, footer {
             background-color: #204051;
             color: white;
             text-align: center;
             padding: 10px 0;
         }
-
         h1 {
             margin: 0;
         }
-
         nav {
             display: flex;
             justify-content: center;
             background-color: #3b6978;
             padding: 20px 0;
         }
-
         nav ul {
             list-style-type: none;
             padding: 0;
         }
-
         nav ul li {
             display: inline;
             margin-right: 10px;
         }
-
         nav ul li a {
             text-decoration: none;
             color: white;
             font-weight: bold;
         }
-
         button {
             padding: 10px 20px;
             cursor: pointer;
@@ -54,210 +47,122 @@
             color: white;
             border-radius: 5px;
         }
-
         button:hover {
             background-color: #cae8d5;
         }
-
         footer p {
             margin: 0;
             font-size: 0.8rem;
         }
-
         .introduction {
             padding: 20px;
             text-align: center;
         }
-
         .featured-image {
             width: 100%;
             height: auto;
             display: block;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
         .logo {
             display: block;
             margin: 10px auto;
             width: 80px;
             animation: spin 20s linear infinite;
         }
-
-        .comments-section {
-            padding: 20px;
-        }
-
-        .comment {
-            border-bottom: 1px solid #ddd;
-            padding: 10px 0;
-        }
-
-        .comment-user {
-            font-weight: bold;
-        }
-
-        .like-btn {
-            cursor: pointer;
-            color: #007BFF;
-        }
-
-        .like-btn:hover {
-            text-decoration: underline;
-        }
     </style>
-    <script src="https://apis.google.com/js/api:client.js"></script>
 </head>
 <body>
     <header>
         <h1>生物學習平台</h1>
-        <img src="bernese.JPG" alt="學習平台Logo" class="logo">
+        <img src="bernese.JPG" alt="学習平台Logo" class="logo">
     </header>
     <nav>
-        <button id="google-login-btn">使用 Google 帳號登錄</button>
+        <button id="google-login-btn">使用 Google 帳號登入</button>
+        <button id="logout-btn" style="display: none;">登出</button>
         <ul>
             <li><a href="biologylesson.html">課程學習</a></li>
             <li><a href="biologyquiz.html">測驗</a></li>
             <li><a href="videos.html">教學影片</a></li>
+            <li><a href='biologyprofile.html'>個人檔案</a></li>
         </ul>
     </nav>
     <div class="introduction">
-        <h2>歡迎来到生物學習平台</h2>
-        <p>這裏你可以學習到有關哺乳累和節肢動物的有趣知識。</p>
+        <h2>歡迎來到生物學習平台</h2>
+        <p>這裡你可以學習到關於哺乳類和節肢動物的有趣知識。</p>
+        <div id="user-info"></div>
     </div>
     <img src="home.jpg" alt="Featured Animal" class="featured-image">
-    <div class="comments-section">
-        <h3>留言區</h3>
-        <div id="comments"></div>
-        <textarea id="comment-input" placeholder="發表你的留言..."></textarea>
-        <button id="post-comment-btn">發表留言</button>
-    </div>
     <footer>
         <p>版權所有 © 生物學習平台</p>
     </footer>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script> <!-- Ensure Firestore is included -->
     <script>
-        // Firebase configuration
-        var firebaseConfig = {
-            apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-            authDomain: "biologylearning-s11055013.firebaseapp.com",
-            databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
-            projectId: "biologylearning-s11055013",
-            storageBucket: "biologylearning-s11055013.appspot.com",
-            messagingSenderId: "743496923725",
-            appId: "1:743496923725:web:866adef56bd80b02d53a04"
-        };
-        firebase.initializeApp(firebaseConfig);
+    var firebaseConfig = {
+        apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+        authDomain: "biologylearning-s11055013.firebaseapp.com",
+        databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
+        projectId: "biologylearning-s11055013",
+        storageBucket: "biologylearning-s11055013.appspot.com",
+        messagingSenderId: "743496923725",
+        appId: "1:743496923725:web:866adef56bd80b02d53a04"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
 
-        let googleAuth;
-        let currentUser;
+    function saveUserData(user) {
+        firebase.firestore().collection('users').doc(user.uid).set({
+            username: user.displayName,
+            useremail: user.email
+        }, { merge: true })
+        .then(() => console.log("User data saved."))
+        .catch(error => console.error("Error saving user data: ", error));
+    }
 
-        function initGoogleAuth() {
-            gapi.load('auth2', function() {
-                googleAuth = gapi.auth2.init({
-                    client_id: '130442278978-j29rl7r5srslikgar49cu0616e24icep.apps.googleusercontent.com'
-                });
-                googleAuth.then(function() {
-                    updateLoginStatus();
-                });
-            });
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
+            document.getElementById('logout-btn').style.display = 'block';
+            document.getElementById('google-login-btn').style.display = 'none';
+            saveUserData(user);
+        } else {
+            document.getElementById('user-info').innerHTML = '';
+            document.getElementById('logout-btn').style.display = 'none';
+            document.getElementById('google-login-btn').style.display = 'block';
         }
+    });
 
-        function updateLoginStatus() {
-            if (googleAuth.isSignedIn.get()) {
-                let googleUser = googleAuth.currentUser.get();
-                let profile = googleUser.getBasicProfile();
-                currentUser = {
-                    uid: googleUser.getId(),
-                    name: profile.getName()
-                };
-                let loginButton = document.getElementById('google-login-btn');
-                loginButton.textContent = currentUser.name;
-                loginButton.onclick = function() {
-                    window.location.href = 'profile.html';
-                };
-                loadComments();
-            }
-        }
-
-        document.getElementById('google-login-btn').addEventListener('click', function() {
-            if (!googleAuth.isSignedIn.get()) {
-                googleAuth.signIn().then(function(googleUser) {
-                    updateLoginStatus();
-                }).catch(function(error) {
-                    console.error("Error signing in: ", error);
-                });
-            } else {
-                window.location.href = 'profile.html';
-            }
+    function signInWithGoogle() {
+        firebase.auth().signInWithPopup(provider).then(result => {
+            const user = result.user;
+            console.log('Signed in as: ' + user.displayName);
+            saveUserData(user);
+        }).catch(error => {
+            console.error('Sign in failed: ', error.code, error.message);
         });
+    }
 
-        document.getElementById('post-comment-btn').addEventListener('click', function() {
-            if (currentUser) {
-                let commentText = document.getElementById('comment-input').value;
-                if (commentText) {
-                    postComment(currentUser.uid, currentUser.name, commentText);
-                    document.getElementById('comment-input').value = '';
-                }
-            } else {
-                alert("請先使用 Google 登錄後再發表留言。");
-            }
+    function signOut() {
+        firebase.auth().signOut().then(() => {
+            console.log('User signed out.');
+            document.getElementById('user-info').innerHTML = '';
+            document.getElementById('logout-btn').style.display = 'none';
+            document.getElementById('google-login-btn').style.display = 'block';
+        }).catch(error => {
+            console.error('Sign out Error', error);
         });
+    }
 
-        function postComment(uid, name, text) {
-            let newCommentKey = firebase.database().ref().child('comments').push().key;
-            let commentData = {
-                uid: uid,
-                name: name,
-                text: text,
-                likes: 0
-            };
-            let updates = {};
-            updates['/comments/' + newCommentKey] = commentData;
-            firebase.database().ref().update(updates);
-            loadComments();
-        }
-
-        function loadComments() {
-            firebase.database().ref('/comments').once('value').then(function(snapshot) {
-                let commentsDiv = document.getElementById('comments');
-                commentsDiv.innerHTML = '';
-                snapshot.forEach(function(childSnapshot) {
-                    let comment = childSnapshot.val();
-                    let commentElement = document.createElement('div');
-                    commentElement.className = 'comment';
-                    commentElement.innerHTML = `
-                        <p class="comment-user">${comment.name}</p>
-                        <p>${comment.text}</p>
-                        <p><span class="like-btn" data-key="${childSnapshot.key}" data-likes="${comment.likes}">讚 (${comment.likes})</span></p>
-                    `;
-                    commentsDiv.appendChild(commentElement);
-                });
-                attachLikeEvents();
-            });
-        }
-
-        function attachLikeEvents() {
-            let likeButtons = document.querySelectorAll('.like-btn');
-            likeButtons.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    let commentKey = this.getAttribute('data-key');
-                    let likes = parseInt(this.getAttribute('data-likes'));
-                    let newLikes = likes + 1;
-                    firebase.database().ref('/comments/' + commentKey).update({ likes: newLikes });
-                    loadComments();
-                });
-            });
-        }
-
-        window.onload = function() {
-            initGoogleAuth();
-        };
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('google-login-btn').addEventListener('click', signInWithGoogle);
+        document.getElementById('logout-btn').addEventListener('click', signOut);
+    });
     </script>
 </body>
 </html>
