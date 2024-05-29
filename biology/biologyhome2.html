@@ -444,11 +444,16 @@ function loadChatMessages(friendId) {
     chatRef.off();
     chatRef.on('child_added', snapshot => {
         let message = snapshot.val();
-        let messageElement = document.createElement('div');
-        messageElement.textContent = message.senderName + ': ' + message.text;
-        chatMessagesDiv.appendChild(messageElement);
-        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        displayMessage(message);
     });
+}
+
+function displayMessage(message) {
+    let chatMessagesDiv = document.getElementById('chat-messages');
+    let messageElement = document.createElement('div');
+    messageElement.textContent = message.senderName + ': ' + message.text;
+    chatMessagesDiv.appendChild(messageElement);
+    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
 }
 
 function sendMessage() {
