@@ -149,6 +149,7 @@
         <h2>歡迎來到生物學習平台</h2>
         <p>這裡你可以學習到關於哺乳類和節肢動物的有趣知識。</p>
         <div id="user-info"></div>
+        <div id="user-code"></div> <!-- 用于显示用户代码 -->
     </div>
     <img src="home.jpg" alt="Featured Animal" class="featured-image">
     <div class="comments-section">
@@ -156,6 +157,12 @@
         <div id="comments"></div>
         <textarea id="comment-input" placeholder="發表你的留言..."></textarea>
         <button id="post-comment-btn">發表留言</button>
+    </div>
+    <div class="friend-section">
+        <h3>加好友</h3>
+        <input type="text" id="friend-code-input" placeholder="輸入好友代碼">
+        <button id="add-friend-btn">加好友</button>
+        <div id="friend-list"></div>
     </div>
     <footer>
         <p>版權所有 © 生物學習平台</p>
@@ -177,12 +184,27 @@
     var provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
+    function generateRandomCode(length) {
+        var result = '';
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
     function saveUserData(user) {
+        var userCode = generateRandomCode(8);
         firebase.firestore().collection('users').doc(user.uid).set({
             username: user.displayName,
-            useremail: user.email
+            useremail: user.email,
+            usercode: userCode
         }, { merge: true })
-        .then(() => console.log("User data saved."))
+        .then(() => {
+            console.log("User data saved.");
+            document.getElementById('user-code').innerHTML = '你的代碼是: ' + userCode;
+        })
         .catch(error => console.error("Error saving user data: ", error));
     }
 
@@ -238,12 +260,43 @@
         });
     }
 
+    function addFriend(userCode) {
+        firebase.firestore().collection('users').where('usercode', '==', userCode).get()
+        .then(querySnapshot => {
+            if (!querySnapshot.empty) {
+                querySnapshot.forEach(doc => {
+                    let friendData = doc.data();
+                    let friendListDiv = document.getElementById('friend-list');
+                    let friendElement = document.createElement('div');
+                    friendElement.className = 'friend';
+                    friendElement.innerHTML = `<p>好友名稱: ${friendData.username} (代碼: ${friendData.usercode})</p>`;
+                    friendListDiv.appendChild(friendElement);
+                });
+            } else {
+                alert('找不到該代碼的使用者。');
+            }
+        })
+        .catch(error => console.error("Error adding friend: ", error));
+    }
+
+    function displayUserCode(uid) {
+        firebase.firestore().collection('users').doc(uid).get().then(doc => {
+            if (doc.exists) {
+                let userData = doc.data();
+                document.getElementById('user-code').innerHTML = '你的代碼是: ' + userData.usercode;
+            }
+        }).catch(error => {
+            console.error("Error getting user code: ", error);
+        });
+    }
+
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
             document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
             document.getElementById('logout-btn').style.display = 'block';
             document.getElementById('google-login-btn').style.display = 'none';
             saveUserData(user);
+            displayUserCode(user.uid);
             loadComments();
         } else {
             document.getElementById('user-info').innerHTML = '';
@@ -286,6 +339,12 @@
                 }
             } else {
                 alert("請先使用 Google 登錄後再發表留言。");
+            }
+        });
+        document.getElementById('add-friend-btn').addEventListener('click', () => {
+            let friendCode = document.getElementById('friend-code-input').value;
+            if (friendCode.trim() !== "") {
+                addFriend(friendCode);
             }
         });
     });
