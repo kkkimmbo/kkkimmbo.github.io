@@ -262,278 +262,280 @@
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
     <script>
-    var firebaseConfig = {
-        apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-        authDomain: "biologylearning-s11055013.firebaseapp.com",
-        databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
-        projectId: "biologylearning-s11055013",
-        storageBucket: "biologylearning-s11055013.appspot.com",
-        messagingSenderId: "743496923725",
-        appId: "1:743496923725:web:866adef56bd80b02d53a04"
-    };
-    firebase.initializeApp(firebaseConfig);
-    var provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
+   var firebaseConfig = {
+    apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+    authDomain: "biologylearning-s11055013.firebaseapp.com",
+    databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
+    projectId: "biologylearning-s11055013",
+    storageBucket: "biologylearning-s11055013.appspot.com",
+    messagingSenderId: "743496923725",
+    appId: "1:743496923725:web:866adef56bd80b02d53a04"
+};
+firebase.initializeApp(firebaseConfig);
+var provider = new firebase.auth.GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' });
 
-    var currentChatUser = null;
+var currentChatUser = null;
 
-    function generateRandomCode(length) {
-        var result = '';
-        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        var charactersLength = characters.length;
-        for (var i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        return result;
+function generateRandomCode(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
+    return result;
+}
 
-    function saveUserData(user) {
-        var userRef = firebase.firestore().collection('users').doc(user.uid);
-        userRef.get().then((doc) => {
-            if (doc.exists) {
-                var userData = doc.data();
-                document.getElementById('user-code').innerHTML = '你的代碼是: ' + userData.usercode;
-            } else {
-                var userCode = generateRandomCode(8);
-                userRef.set({
-                    username: user.displayName,
-                    useremail: user.email,
-                    usercode: userCode,
-                    friends: []
-                }).then(() => {
-                    console.log("User data saved.");
-                    document.getElementById('user-code').innerHTML = '你的代碼是: ' + userCode;
-                }).catch(error => console.error("Error saving user data: ", error));
-            }
-        }).catch(error => console.error("Error getting user data: ", error));
-    }
-
-    function postComment(uid, name, text) {
-        let newCommentKey = firebase.firestore().collection('comments').doc().id;
-        let commentData = {
-            uid: uid,
-            name: name,
-            text: text,
-            likes: 0,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        firebase.firestore().collection('comments').doc(newCommentKey).set(commentData)
-        .then(() => {
-            console.log("Comment posted.");
-            loadComments();
-        })
-        .catch(error => console.error("Error posting comment: ", error));
-    }
-
-    function loadComments() {
-        firebase.firestore().collection('comments').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-            let commentsDiv = document.getElementById('comments');
-            commentsDiv.innerHTML = '';
-            snapshot.forEach(doc => {
-                let comment = doc.data();
-                let commentElement = document.createElement('div');
-                commentElement.className = 'comment';
-                commentElement.innerHTML = `
-                    <p class="comment-user">${comment.name}</p>
-                    <p>${comment.text}</p>
-                    <p><span class="like-btn" data-key="${doc.id}" data-likes="${comment.likes}">讚 (${comment.likes})</span></p>
-                `;
-                commentsDiv.appendChild(commentElement);
-            });
-            attachLikeEvents();
-        });
-    }
-
-    function attachLikeEvents() {
-        let likeButtons = document.querySelectorAll('.like-btn');
-        likeButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                let commentKey = button.getAttribute('data-key');
-                let likes = parseInt(button.getAttribute('data-likes'));
-                let newLikes = likes + 1;
-                firebase.firestore().collection('comments').doc(commentKey).update({ likes: newLikes })
-                .then(() => {
-                    console.log("Like updated.");
-                })
-                .catch(error => console.error("Error updating like: ", error));
-            });
-        });
-    }
-
-    function addFriend(userCode) {
-        let currentUser = firebase.auth().currentUser;
-        let friendMessage = document.getElementById('friend-message');
-
-        if (!currentUser) {
-            friendMessage.textContent = '請先登入才能添加好友。';
-            return;
-        }
-
-        firebase.firestore().collection('users').where('usercode', '==', userCode).get()
-        .then(querySnapshot => {
-            if (!querySnapshot.empty) {
-                querySnapshot.forEach(doc => {
-                    let friendData = doc.data();
-                    let friendId = doc.id;
-
-                    // 添加好友到當前用戶的好友列表
-                    firebase.firestore().collection('users').doc(currentUser.uid).update({
-                        friends: firebase.firestore.FieldValue.arrayUnion(friendId)
-                    }).then(() => {
-                        // 添加當前用戶到好友的好友列表
-                        firebase.firestore().collection('users').doc(friendId).update({
-                            friends: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
-                        }).then(() => {
-                            friendMessage.textContent = `已成功添加 '${friendData.username}' 為好友。`;
-                            loadFriendList(currentUser.uid);
-                            loadFriendList(friendId); // 更新好友的好友列表
-                        }).catch(error => console.error("Error adding friend to friend's list: ", error));
-                    }).catch(error => console.error("Error adding friend: ", error));
-                });
-            } else {
-                friendMessage.textContent = '找不到該代碼的使用者。';
-            }
-        })
-        .catch(error => console.error("Error adding friend: ", error));
-    }
-
-    function loadFriendList(userId) {
-        let friendListDiv = document.getElementById('friend-list');
-        friendListDiv.innerHTML = '';
-
-        firebase.firestore().collection('users').doc(userId).get()
-        .then(doc => {
-            if (doc.exists) {
-                let userData = doc.data();
-                let friendIds = userData.friends || [];
-
-                friendIds.forEach(friendId => {
-                    firebase.firestore().collection('users').doc(friendId).get()
-                    .then(friendDoc => {
-                        if (friendDoc.exists) {
-                            let friendData = friendDoc.data();
-                            let friendElement = document.createElement('div');
-                            friendElement.className = 'friend';
-                            friendElement.innerHTML = `<p>${friendData.username}</p>`;
-                            friendElement.addEventListener('click', () => {
-                                openChatBox(friendId, friendData.username);
-                            });
-                            friendListDiv.appendChild(friendElement);
-                        }
-                    }).catch(error => console.error("Error loading friend data: ", error));
-                });
-            }
-        }).catch(error => console.error("Error loading user data: ", error));
-    }
-
-    function openChatBox(friendId, friendName) {
-        currentChatUser = friendId;
-        document.getElementById('chat-header').innerText = '與 ' + friendName + ' 聊天';
-        document.getElementById('chat-box').style.display = 'flex';
-        loadChatMessages(friendId);
-    }
-
-    function loadChatMessages(friendId) {
-        let currentUserId = firebase.auth().currentUser.uid;
-        let chatMessagesDiv = document.getElementById('chat-messages');
-        chatMessagesDiv.innerHTML = '';
-
-        let chatId = currentUserId < friendId ? currentUserId + '_' + friendId : friendId + '_' + currentUserId;
-        let chatRef = firebase.database().ref('chats/' + chatId);
-
-        chatRef.off();
-        chatRef.on('child_added', snapshot => {
-            let message = snapshot.val();
-            let messageElement = document.createElement('div');
-            messageElement.textContent = message.senderName + ': ' + message.text;
-            chatMessagesDiv.appendChild(messageElement);
-            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-        });
-    }
-
-    function sendMessage() {
-        let chatInput = document.getElementById('chat-input');
-        let messageText = chatInput.value.trim();
-        if (messageText === '') return;
-
-        let currentUser = firebase.auth().currentUser;
-        let friendId = currentChatUser;
-
-        if (!currentUser || !friendId) return;
-
-        let chatId = currentUser.uid < friendId ? currentUser.uid + '_' + friendId : friendId + '_' + currentUser.uid;
-        let chatRef = firebase.database().ref('chats/' + chatId);
-        let newMessageRef = chatRef.push();
-
-        newMessageRef.set({
-            senderId: currentUser.uid,
-            senderName: currentUser.displayName,
-            text: messageText,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
-        });
-
-        chatInput.value = '';
-    }
-
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
-            document.getElementById('logout-btn').style.display = 'block';
-            document.getElementById('google-login-btn').style.display = 'none';
-            saveUserData(user);
-            loadComments();
-            loadFriendList(user.uid);
+function saveUserData(user) {
+    var userRef = firebase.firestore().collection('users').doc(user.uid);
+    userRef.get().then((doc) => {
+        if (doc.exists) {
+            var userData = doc.data();
+            document.getElementById('user-code').innerHTML = '你的代碼是: ' + userData.usercode;
         } else {
-            document.getElementById('user-info').innerHTML = '';
-            document.getElementById('logout-btn').style.display = 'none';
-            document.getElementById('google-login-btn').style.display = 'block';
+            var userCode = generateRandomCode(8);
+            userRef.set({
+                username: user.displayName,
+                useremail: user.email,
+                usercode: userCode,
+                friends: []
+            }).then(() => {
+                console.log("User data saved.");
+                document.getElementById('user-code').innerHTML = '你的代碼是: ' + userCode;
+            }).catch(error => console.error("Error saving user data: ", error));
+        }
+    }).catch(error => console.error("Error getting user data: ", error));
+}
+
+function postComment(uid, name, text) {
+    let newCommentKey = firebase.firestore().collection('comments').doc().id;
+    let commentData = {
+        uid: uid,
+        name: name,
+        text: text,
+        likes: 0,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    firebase.firestore().collection('comments').doc(newCommentKey).set(commentData)
+    .then(() => {
+        console.log("Comment posted.");
+        loadComments();
+    })
+    .catch(error => console.error("Error posting comment: ", error));
+}
+
+function loadComments() {
+    firebase.firestore().collection('comments').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+        let commentsDiv = document.getElementById('comments');
+        commentsDiv.innerHTML = '';
+        snapshot.forEach(doc => {
+            let comment = doc.data();
+            let commentElement = document.createElement('div');
+            commentElement.className = 'comment';
+            commentElement.innerHTML = `
+                <p class="comment-user">${comment.name}</p>
+                <p>${comment.text}</p>
+                <p><span class="like-btn" data-key="${doc.id}" data-likes="${comment.likes}">讚 (${comment.likes})</span></p>
+            `;
+            commentsDiv.appendChild(commentElement);
+        });
+        attachLikeEvents();
+    });
+}
+
+function attachLikeEvents() {
+    let likeButtons = document.querySelectorAll('.like-btn');
+    likeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            let commentKey = button.getAttribute('data-key');
+            let likes = parseInt(button.getAttribute('data-likes'));
+            let newLikes = likes + 1;
+            firebase.firestore().collection('comments').doc(commentKey).update({ likes: newLikes })
+            .then(() => {
+                console.log("Like updated.");
+            })
+            .catch(error => console.error("Error updating like: ", error));
+        });
+    });
+}
+
+function addFriend(userCode) {
+    let currentUser = firebase.auth().currentUser;
+    let friendMessage = document.getElementById('friend-message');
+
+    if (!currentUser) {
+        friendMessage.textContent = '請先登入才能添加好友。';
+        return;
+    }
+
+    firebase.firestore().collection('users').where('usercode', '==', userCode).get()
+    .then(querySnapshot => {
+        if (!querySnapshot.empty) {
+            querySnapshot.forEach(doc => {
+                let friendData = doc.data();
+                let friendId = doc.id;
+
+                // 添加好友到當前用戶的好友列表
+                firebase.firestore().collection('users').doc(currentUser.uid).update({
+                    friends: firebase.firestore.FieldValue.arrayUnion(friendId)
+                }).then(() => {
+                    // 添加當前用戶到好友的好友列表
+                    firebase.firestore().collection('users').doc(friendId).update({
+                        friends: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
+                    }).then(() => {
+                        friendMessage.textContent = `已成功添加 '${friendData.username}' 為好友。`;
+                        loadFriendList(currentUser.uid);
+                        loadFriendList(friendId); // 更新好友的好友列表
+                    }).catch(error => console.error("Error adding friend to friend's list: ", error));
+                }).catch(error => console.error("Error adding friend: ", error));
+            });
+        } else {
+            friendMessage.textContent = '找不到該代碼的使用者。';
+        }
+    })
+    .catch(error => console.error("Error adding friend: ", error));
+}
+
+function loadFriendList(userId) {
+    let friendListDiv = document.getElementById('friend-list');
+    friendListDiv.innerHTML = '';
+
+    firebase.firestore().collection('users').doc(userId).get()
+    .then(doc => {
+        if (doc.exists) {
+            let userData = doc.data();
+            let friendIds = userData.friends || [];
+
+            friendIds.forEach(friendId => {
+                firebase.firestore().collection('users').doc(friendId).get()
+                .then(friendDoc => {
+                    if (friendDoc.exists) {
+                        let friendData = friendDoc.data();
+                        let friendElement = document.createElement('div');
+                        friendElement.className = 'friend';
+                        friendElement.innerHTML = `<p>${friendData.username}</p>`;
+                        friendElement.addEventListener('click', () => {
+                            openChatBox(friendId, friendData.username);
+                        });
+                        friendListDiv.appendChild(friendElement);
+                    }
+                }).catch(error => console.error("Error loading friend data: ", error));
+            });
+        }
+    }).catch(error => console.error("Error loading user data: ", error));
+}
+
+function openChatBox(friendId, friendName) {
+    currentChatUser = friendId;
+    document.getElementById('chat-header').innerText = '與 ' + friendName + ' 聊天';
+    document.getElementById('chat-box').style.display = 'flex';
+    loadChatMessages(friendId);
+}
+
+function loadChatMessages(friendId) {
+    let currentUserId = firebase.auth().currentUser.uid;
+    let chatMessagesDiv = document.getElementById('chat-messages');
+    chatMessagesDiv.innerHTML = '';
+
+    let chatId = currentUserId < friendId ? currentUserId + '_' + friendId : friendId + '_' + currentUserId;
+    let chatRef = firebase.database().ref('chats/' + chatId);
+
+    chatRef.off();
+    chatRef.on('child_added', snapshot => {
+        let message = snapshot.val();
+        let messageElement = document.createElement('div');
+        messageElement.textContent = message.senderName + ': ' + message.text;
+        chatMessagesDiv.appendChild(messageElement);
+        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+    });
+}
+
+function sendMessage() {
+    let chatInput = document.getElementById('chat-input');
+    let messageText = chatInput.value.trim();
+    if (messageText === '') return;
+
+    let currentUser = firebase.auth().currentUser;
+    let friendId = currentChatUser;
+
+    if (!currentUser || !friendId) return;
+
+    let chatId = currentUser.uid < friendId ? currentUser.uid + '_' + friendId : friendId + '_' + currentUser.uid;
+    let chatRef = firebase.database().ref('chats/' + chatId);
+    let newMessageRef = chatRef.push();
+
+    newMessageRef.set({
+        senderId: currentUser.uid,
+        senderName: currentUser.displayName,
+        text: messageText,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+        chatInput.value = '';
+        chatInput.focus();
+    }).catch(error => console.error("Error sending message: ", error));
+}
+
+firebase.auth().onAuthStateChanged(user => {
+    if (user) {
+        document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
+        document.getElementById('logout-btn').style.display = 'block';
+        document.getElementById('google-login-btn').style.display = 'none';
+        saveUserData(user);
+        loadComments();
+        loadFriendList(user.uid);
+    } else {
+        document.getElementById('user-info').innerHTML = '';
+        document.getElementById('logout-btn').style.display = 'none';
+        document.getElementById('google-login-btn').style.display = 'block';
+    }
+});
+
+function signInWithGoogle() {
+    firebase.auth().signInWithPopup(provider).then(result => {
+        const user = result.user;
+        console.log('Signed in as: ' + user.displayName);
+        saveUserData(user);
+    }).catch(error => {
+        console.error('Sign in failed: ', error.code, error.message);
+    });
+}
+
+function signOut() {
+    firebase.auth().signOut().then(() => {
+        console.log('User signed out.');
+        document.getElementById('user-info').innerHTML = '';
+        document.getElementById('logout-btn').style.display = 'none';
+        document.getElementById('google-login-btn').style.display = 'block';
+    }).catch(error => {
+        console.error('Sign out Error', error);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('google-login-btn').addEventListener('click', signInWithGoogle);
+    document.getElementById('logout-btn').addEventListener('click', signOut);
+    document.getElementById('post-comment-btn').addEventListener('click', () => {
+        if (firebase.auth().currentUser) {
+            let commentText = document.getElementById('comment-input').value;
+            if (commentText.trim() !== "") {
+                let user = firebase.auth().currentUser;
+                postComment(user.uid, user.displayName, commentText);
+                document.getElementById('comment-input').value = '';
+            }
+        } else {
+            alert("請先使用 Google 登錄後再發表留言。");
         }
     });
-
-    function signInWithGoogle() {
-        firebase.auth().signInWithPopup(provider).then(result => {
-            const user = result.user;
-            console.log('Signed in as: ' + user.displayName);
-            saveUserData(user);
-        }).catch(error => {
-            console.error('Sign in failed: ', error.code, error.message);
-        });
-    }
-
-    function signOut() {
-        firebase.auth().signOut().then(() => {
-            console.log('User signed out.');
-            document.getElementById('user-info').innerHTML = '';
-            document.getElementById('logout-btn').style.display = 'none';
-            document.getElementById('google-login-btn').style.display = 'block';
-        }).catch(error => {
-            console.error('Sign out Error', error);
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('google-login-btn').addEventListener('click', signInWithGoogle);
-        document.getElementById('logout-btn').addEventListener('click', signOut);
-        document.getElementById('post-comment-btn').addEventListener('click', () => {
-            if (firebase.auth().currentUser) {
-                let commentText = document.getElementById('comment-input').value;
-                if (commentText.trim() !== "") {
-                    let user = firebase.auth().currentUser;
-                    postComment(user.uid, user.displayName, commentText);
-                    document.getElementById('comment-input').value = '';
-                }
-            } else {
-                alert("請先使用 Google 登錄後再發表留言。");
-            }
-        });
-        document.getElementById('add-friend-btn').addEventListener('click', () => {
-            let friendCode = document.getElementById('friend-code-input').value;
-            if (friendCode.trim() !== "") {
-                addFriend(friendCode);
-            }
-        });
-        document.getElementById('send-chat-btn').addEventListener('click', sendMessage);
+    document.getElementById('add-friend-btn').addEventListener('click', () => {
+        let friendCode = document.getElementById('friend-code-input').value;
+        if (friendCode.trim() !== "") {
+            addFriend(friendCode);
+        }
     });
+    document.getElementById('send-chat-btn').addEventListener('click', sendMessage);
+});
+
     </script>
 </body>
 </html>
