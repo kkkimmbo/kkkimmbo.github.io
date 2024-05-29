@@ -1,12 +1,539 @@
-// Firebase configuration
-var firebaseConfig = {
-    apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
-    authDomain: "biologylearning-s11055013.firebaseapp.com",
-    databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
-    projectId: "biologylearning-s11055013",
-    storageBucket: "biologylearning-s11055013.appspot.com",
-    messagingSenderId: "743496923725",
-    appId: "1:743496923725:web:866adef56bd80b02d53a04"
-};
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="google-signin-client_id" content="130442278978-j29rl7r5srslikgar49cu0616e24icep.apps.googleusercontent.com">
+    <title>生物學習平台</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header, footer {
+            background-color: #204051;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        h1 {
+            margin: 0;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #3b6978;
+            padding: 20px 0;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        nav ul li {
+            margin: 5px 10px;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #84a9ac;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #cae8d5;
+        }
+        footer p {
+            margin: 0;
+            font-size: 0.8rem;
+        }
+        .content {
+            display: flex;
+            flex: 1;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+        }
+        .main-content, .sidebar {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px;
+        }
+        .main-content {
+            flex: 3;
+            margin-right: 20px;
+        }
+        .sidebar {
+            flex: 1;
+            min-width: 250px;
+        }
+        .friend-list .friend {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .introduction {
+            text-align: center;
+        }
+        .featured-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .logo {
+            display: block;
+            margin: 10px auto;
+            width: 80px;
+            animation: spin 20s linear infinite;
+        }
+        .comments-section, .friend-section {
+            margin-top: 20px;
+        }
+        .comment {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .comment-user {
+            font-weight: bold;
+        }
+        .like-btn {
+            cursor: pointer;
+            color: #007BFF;
+        }
+        .like-btn:hover {
+            text-decoration: underline;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        textarea, input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: none;
+        }
+        .comments-section button, .friend-section button {
+            display: block;
+            width: 100%;
+        }
+        #friend-message {
+            margin-top: 10px;
+            color: green;
+        }
+        .chat-box {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 300px;
+            max-height: 400px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+            flex-direction: column;
+        }
+        .chat-header {
+            background-color: #204051;
+            color: white;
+            padding: 10px;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+        .chat-input textarea {
+            flex: 1;
+            resize: none;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            .main-content {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>生物學習平台</h1>
+        <img src="bernese.JPG" alt="學習平台Logo" class="logo">
+    </header>
+    <nav>
+        <button id="google-login-btn">使用 Google 帳號登入</button>
+        <button id="logout-btn" style="display: none;">登出</button>
+        <ul>
+            <li><a href="biologylesson.html">課程學習</a></li>
+            <li><a href="biologyquiz.html">測驗</a></li>
+            <li><a href="videos.html">教學影片</a></li>
+            <li><a href="biologyprofile.html">個人檔案</a></li>
+        </ul>
+    </nav>
+    <div class="content">
+        <div class="main-content">
+            <div class="introduction">
+                <h2>歡迎來到生物學習平台</h2>
+                <p>這裡你可以學習到關於哺乳類和節肢動物的有趣知識。</p>
+                <div id="user-info"></div>
+                <div id="user-code"></div> <!-- 用于显示用户代码 -->
+            </div>
+            <img src="home.jpg" alt="Featured Animal" class="featured-image">
+            <div class="comments-section">
+                <h3>留言區</h3>
+                <div id="comments"></div>
+                <div class="form-group">
+                    <textarea id="comment-input" placeholder="發表你的留言..."></textarea>
+                </div>
+                <button id="post-comment-btn">發表留言</button>
+            </div>
+            <div class="friend-section">
+                <h3>加好友</h3>
+                <div class="form-group">
+                    <input type="text" id="friend-code-input" placeholder="輸入好友代碼">
+                </div>
+                <button id="add-friend-btn">加好友</button>
+                <div id="friend-message"></div> <!-- 用于显示添加好友的信息 -->
+            </div>
+        </div>
+        <div class="sidebar">
+            <h3>好友列表</h3>
+            <div id="friend-list" class="friend-list"></div> <!-- 好友列表 -->
+        </div>
+    </div>
+    <footer>
+        <p>版權所有 © 生物學習平台</p>
+    </footer>
+
+    <div id="chat-box" class="chat-box">
+        <div class="chat-header" id="chat-header"></div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+            <textarea id="chat-input" placeholder="輸入訊息..."></textarea>
+            <button id="send-chat-btn">傳送</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+    <script>
+    var firebaseConfig = {
+        apiKey: "AIzaSyAifZ76m-W79Ptw3gJVGsolZDnoXu72mDc",
+        authDomain: "biologylearning-s11055013.firebaseapp.com",
+        databaseURL: "https://biologylearning-s11055013-default-rtdb.firebaseio.com",
+        projectId: "biologylearning-s11055013",
+        storageBucket: "biologylearning-s11055013.appspot.com",
+        messagingSenderId: "743496923725",
+        appId: "1:743496923725:web:866adef56bd80b02d53a04"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    var currentChatUser = null;
+
+    function generateRandomCode(length) {
+        var result = '';
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
+    function saveUserData(user) {
+        var userRef = firebase.firestore().collection('users').doc(user.uid);
+        userRef.get().then((doc) => {
+            if (doc.exists) {
+                var userData = doc.data();
+                document.getElementById('user-code').innerHTML = '你的代碼是: ' + userData.usercode;
+            } else {
+                var userCode = generateRandomCode(8);
+                userRef.set({
+                    username: user.displayName,
+                    useremail: user.email,
+                    usercode: userCode,
+                    friends: []
+                }).then(() => {
+                    console.log("User data saved.");
+                    document.getElementById('user-code').innerHTML = '你的代碼是: ' + userCode;
+                }).catch(error => console.error("Error saving user data: ", error));
+            }
+        }).catch(error => console.error("Error getting user data: ", error));
+    }
+
+    function postComment(uid, name, text) {
+        let newCommentKey = firebase.firestore().collection('comments').doc().id;
+        let commentData = {
+            uid: uid,
+            name: name,
+            text: text,
+            likes: 0,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        firebase.firestore().collection('comments').doc(newCommentKey).set(commentData)
+        .then(() => {
+            console.log("Comment posted.");
+            loadComments();
+        })
+        .catch(error => console.error("Error posting comment: ", error));
+    }
+
+    function loadComments() {
+        firebase.firestore().collection('comments').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+            let commentsDiv = document.getElementById('comments');
+            commentsDiv.innerHTML = '';
+            snapshot.forEach(doc => {
+                let comment = doc.data();
+                let commentElement = document.createElement('div');
+                commentElement.className = 'comment';
+                commentElement.innerHTML = `
+                    <p class="comment-user">${comment.name}</p>
+                    <p>${comment.text}</p>
+                    <p><span class="like-btn" data-key="${doc.id}" data-likes="${comment.likes}">讚 (${comment.likes})</span></p>
+                `;
+                commentsDiv.appendChild(commentElement);
+            });
+            attachLikeEvents();
+        });
+    }
+
+    function attachLikeEvents() {
+        let likeButtons = document.querySelectorAll('.like-btn');
+        likeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                let commentKey = button.getAttribute('data-key');
+                let likes = parseInt(button.getAttribute('data-likes'));
+                let newLikes = likes + 1;
+                firebase.firestore().collection('comments').doc(commentKey).update({ likes: newLikes })
+                .then(() => {
+                    console.log("Like updated.");
+                })
+                .catch(error => console.error("Error updating like: ", error));
+            });
+        });
+    }
+
+    function addFriend(userCode) {
+        let currentUser = firebase.auth().currentUser;
+        let friendMessage = document.getElementById('friend-message');
+
+        if (!currentUser) {
+            friendMessage.textContent = '請先登入才能添加好友。';
+            return;
+        }
+
+        firebase.firestore().collection('users').where('usercode', '==', userCode).get()
+        .then(querySnapshot => {
+            if (!querySnapshot.empty) {
+                querySnapshot.forEach(doc => {
+                    let friendData = doc.data();
+                    let friendId = doc.id;
+
+                    // 添加好友到當前用戶的好友列表
+                    firebase.firestore().collection('users').doc(currentUser.uid).update({
+                        friends: firebase.firestore.FieldValue.arrayUnion(friendId)
+                    }).then(() => {
+                        // 添加當前用戶到好友的好友列表
+                        firebase.firestore().collection('users').doc(friendId).update({
+                            friends: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
+                        }).then(() => {
+                            friendMessage.textContent = `已成功添加 '${friendData.username}' 為好友。`;
+                            loadFriendList(currentUser.uid);
+                            loadFriendList(friendId); // 更新好友的好友列表
+                        }).catch(error => console.error("Error adding friend to friend's list: ", error));
+                    }).catch(error => console.error("Error adding friend: ", error));
+                });
+            } else {
+                friendMessage.textContent = '找不到該代碼的使用者。';
+            }
+        })
+        .catch(error => console.error("Error adding friend: ", error));
+    }
+
+    function loadFriendList(userId) {
+        let friendListDiv = document.getElementById('friend-list');
+        friendListDiv.innerHTML = '';
+
+        firebase.firestore().collection('users').doc(userId).get()
+        .then(doc => {
+            if (doc.exists) {
+                let userData = doc.data();
+                let friendIds = userData.friends || [];
+
+                friendIds.forEach(friendId => {
+                    firebase.firestore().collection('users').doc(friendId).get()
+                    .then(friendDoc => {
+                        if (friendDoc.exists) {
+                            let friendData = friendDoc.data();
+                            let friendElement = document.createElement('div');
+                            friendElement.className = 'friend';
+                            friendElement.innerHTML = `<p>${friendData.username}</p>`;
+                            friendElement.addEventListener('click', () => {
+                                openChatBox(friendId, friendData.username);
+                            });
+                            friendListDiv.appendChild(friendElement);
+                        }
+                    }).catch(error => console.error("Error loading friend data: ", error));
+                });
+            }
+        }).catch(error => console.error("Error loading user data: ", error));
+    }
+
+    function openChatBox(friendId, friendName) {
+        currentChatUser = friendId;
+        document.getElementById('chat-header').innerText = '與 ' + friendName + ' 聊天';
+        document.getElementById('chat-box').style.display = 'flex';
+        loadChatMessages(friendId);
+    }
+
+    function loadChatMessages(friendId) {
+        let currentUserId = firebase.auth().currentUser.uid;
+        let chatMessagesDiv = document.getElementById('chat-messages');
+        chatMessagesDiv.innerHTML = '';
+
+        let chatId = currentUserId < friendId ? currentUserId + '_' + friendId : friendId + '_' + currentUserId;
+        let chatRef = firebase.database().ref('chats/' + chatId);
+
+        chatRef.off();
+        chatRef.on('child_added', snapshot => {
+            let message = snapshot.val();
+            let messageElement = document.createElement('div');
+            messageElement.textContent = message.senderName + ': ' + message.text;
+            chatMessagesDiv.appendChild(messageElement);
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        });
+    }
+
+    function sendMessage() {
+        let chatInput = document.getElementById('chat-input');
+        let messageText = chatInput.value.trim();
+        if (messageText === '') return;
+
+        let currentUser = firebase.auth().currentUser;
+        let friendId = currentChatUser;
+
+        if (!currentUser || !friendId) return;
+
+        let chatId = currentUser.uid < friendId ? currentUser.uid + '_' + friendId : friendId + '_' + currentUser.uid;
+        let chatRef = firebase.database().ref('chats/' + chatId);
+        let newMessageRef = chatRef.push();
+
+        newMessageRef.set({
+            senderId: currentUser.uid,
+            senderName: currentUser.displayName,
+            text: messageText,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        chatInput.value = '';
+    }
+
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('user-info').innerHTML = 'Hello, ' + user.displayName;
+            document.getElementById('logout-btn').style.display = 'block';
+            document.getElementById('google-login-btn').style.display = 'none';
+            saveUserData(user);
+            loadComments();
+            loadFriendList(user.uid);
+        } else {
+            document.getElementById('user-info').innerHTML = '';
+            document.getElementById('logout-btn').style.display = 'none';
+            document.getElementById('google-login-btn').style.display = 'block';
+        }
+    });
+
+    function signInWithGoogle() {
+        firebase.auth().signInWithPopup(provider).then(result => {
+            const user = result.user;
+            console.log('Signed in as: ' + user.displayName);
+            saveUserData(user);
+        }).catch(error => {
+            console.error('Sign in failed: ', error.code, error.message);
+        });
+    }
+
+    function signOut() {
+        firebase.auth().signOut().then(() => {
+            console.log('User signed out.');
+            document.getElementById('user-info').innerHTML = '';
+            document.getElementById('logout-btn').style.display = 'none';
+            document.getElementById('google-login-btn').style.display = 'block';
+        }).catch(error => {
+            console.error('Sign out Error', error);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('google-login-btn').addEventListener('click', signInWithGoogle);
+        document.getElementById('logout-btn').addEventListener('click', signOut);
+        document.getElementById('post-comment-btn').addEventListener('click', () => {
+            if (firebase.auth().currentUser) {
+                let commentText = document.getElementById('comment-input').value;
+                if (commentText.trim() !== "") {
+                    let user = firebase.auth().currentUser;
+                    postComment(user.uid, user.displayName, commentText);
+                    document.getElementById('comment-input').value = '';
+                }
+            } else {
+                alert("請先使用 Google 登錄後再發表留言。");
+            }
+        });
+        document.getElementById('add-friend-btn').addEventListener('click', () => {
+            let friendCode = document.getElementById('friend-code-input').value;
+            if (friendCode.trim() !== "") {
+                addFriend(friendCode);
+            }
+        });
+        document.getElementById('send-chat-btn').addEventListener('click', sendMessage);
+    });
+    </script>
+</body>
+</html>
