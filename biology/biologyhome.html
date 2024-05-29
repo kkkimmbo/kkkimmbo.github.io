@@ -380,8 +380,14 @@
                     firebase.firestore().collection('users').doc(currentUser.uid).update({
                         friends: firebase.firestore.FieldValue.arrayUnion(friendId)
                     }).then(() => {
-                        friendMessage.textContent = `已成功添加 '${friendData.username}' 為好友。`;
-                        loadFriendList(currentUser.uid);
+                        // 添加當前用戶到好友的好友列表
+                        firebase.firestore().collection('users').doc(friendId).update({
+                            friends: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
+                        }).then(() => {
+                            friendMessage.textContent = `已成功添加 '${friendData.username}' 為好友。`;
+                            loadFriendList(currentUser.uid);
+                            loadFriendList(friendId); // 更新好友的好友列表
+                        }).catch(error => console.error("Error adding friend to friend's list: ", error));
                     }).catch(error => console.error("Error adding friend: ", error));
                 });
             } else {
