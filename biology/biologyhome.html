@@ -10,6 +10,9 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
         header, footer {
             background-color: #204051;
@@ -57,8 +60,28 @@
             margin: 0;
             font-size: 0.8rem;
         }
-        .introduction {
+        .content {
+            display: flex;
+            flex: 1;
+        }
+        .main-content {
             padding: 20px;
+            flex: 1;
+        }
+        .sidebar {
+            background-color: #f4f4f9;
+            padding: 20px;
+            width: 250px;
+            border-left: 1px solid #ddd;
+        }
+        .friend-list .friend {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .introduction {
             text-align: center;
         }
         .featured-image {
@@ -110,6 +133,14 @@
             .introduction {
                 padding: 10px;
             }
+            .content {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #ddd;
+            }
         }
 
         @media (max-width: 480px) {
@@ -145,24 +176,32 @@
             <li><a href="biologyprofile.html">個人檔案</a></li>
         </ul>
     </nav>
-    <div class="introduction">
-        <h2>歡迎來到生物學習平台</h2>
-        <p>這裡你可以學習到關於哺乳類和節肢動物的有趣知識。</p>
-        <div id="user-info"></div>
-        <div id="user-code"></div> <!-- 用于显示用户代码 -->
-    </div>
-    <img src="home.jpg" alt="Featured Animal" class="featured-image">
-    <div class="comments-section">
-        <h3>留言區</h3>
-        <div id="comments"></div>
-        <textarea id="comment-input" placeholder="發表你的留言..."></textarea>
-        <button id="post-comment-btn">發表留言</button>
-    </div>
-    <div class="friend-section">
-        <h3>加好友</h3>
-        <input type="text" id="friend-code-input" placeholder="輸入好友代碼">
-        <button id="add-friend-btn">加好友</button>
-        <div id="friend-list"></div>
+    <div class="content">
+        <div class="main-content">
+            <div class="introduction">
+                <h2>歡迎來到生物學習平台</h2>
+                <p>這裡你可以學習到關於哺乳類和節肢動物的有趣知識。</p>
+                <div id="user-info"></div>
+                <div id="user-code"></div> <!-- 用于显示用户代码 -->
+            </div>
+            <img src="home.jpg" alt="Featured Animal" class="featured-image">
+            <div class="comments-section">
+                <h3>留言區</h3>
+                <div id="comments"></div>
+                <textarea id="comment-input" placeholder="發表你的留言..."></textarea>
+                <button id="post-comment-btn">發表留言</button>
+            </div>
+            <div class="friend-section">
+                <h3>加好友</h3>
+                <input type="text" id="friend-code-input" placeholder="輸入好友代碼">
+                <button id="add-friend-btn">加好友</button>
+                <div id="friend-message"></div> <!-- 用于显示添加好友的信息 -->
+            </div>
+        </div>
+        <div class="sidebar">
+            <h3>好友列表</h3>
+            <div id="friend-list" class="friend-list"></div> <!-- 好友列表 -->
+        </div>
     </div>
     <footer>
         <p>版權所有 © 生物學習平台</p>
@@ -195,17 +234,24 @@
     }
 
     function saveUserData(user) {
-        var userCode = generateRandomCode(8);
-        firebase.firestore().collection('users').doc(user.uid).set({
-            username: user.displayName,
-            useremail: user.email,
-            usercode: userCode
-        }, { merge: true })
-        .then(() => {
-            console.log("User data saved.");
-            document.getElementById('user-code').innerHTML = '你的代碼是: ' + userCode;
-        })
-        .catch(error => console.error("Error saving user data: ", error));
+        var userRef = firebase.firestore().collection('users').doc(user.uid);
+        userRef.get().then((doc) => {
+            if (doc.exists) {
+                var userData = doc.data();
+                document.getElementById('user-code').innerHTML = '你的代碼是: ' + userData.usercode;
+            } else {
+                var userCode = generateRandomCode(8);
+                userRef.set({
+                    username: user.displayName,
+                    useremail: user.email,
+                    usercode: userCode,
+                    friends: []
+                }).then(() => {
+                    console.log("User data saved.");
+                    document.getElementById('user-code').innerHTML = '你的代碼是: ' + userCode;
+                }).catch(error => console.error("Error saving user data: ", error));
+            }
+        }).catch(error => console.error("Error getting user data: ", error));
     }
 
     function postComment(uid, name, text) {
@@ -261,33 +307,60 @@
     }
 
     function addFriend(userCode) {
+        let currentUser = firebase.auth().currentUser;
+        let friendMessage = document.getElementById('friend-message');
+
+        if (!currentUser) {
+            friendMessage.textContent = '請先登入才能添加好友。';
+            return;
+        }
+
         firebase.firestore().collection('users').where('usercode', '==', userCode).get()
         .then(querySnapshot => {
             if (!querySnapshot.empty) {
                 querySnapshot.forEach(doc => {
                     let friendData = doc.data();
-                    let friendListDiv = document.getElementById('friend-list');
-                    let friendElement = document.createElement('div');
-                    friendElement.className = 'friend';
-                    friendElement.innerHTML = `<p>好友名稱: ${friendData.username} (代碼: ${friendData.usercode})</p>`;
-                    friendListDiv.appendChild(friendElement);
+                    let friendId = doc.id;
+
+                    // 添加好友到當前用戶的好友列表
+                    firebase.firestore().collection('users').doc(currentUser.uid).update({
+                        friends: firebase.firestore.FieldValue.arrayUnion(friendId)
+                    }).then(() => {
+                        friendMessage.textContent = `已成功添加 '${friendData.username}' 為好友。`;
+                        loadFriendList(currentUser.uid);
+                    }).catch(error => console.error("Error adding friend: ", error));
                 });
             } else {
-                alert('找不到該代碼的使用者。');
+                friendMessage.textContent = '找不到該代碼的使用者。';
             }
         })
         .catch(error => console.error("Error adding friend: ", error));
     }
 
-    function displayUserCode(uid) {
-        firebase.firestore().collection('users').doc(uid).get().then(doc => {
+    function loadFriendList(userId) {
+        let friendListDiv = document.getElementById('friend-list');
+        friendListDiv.innerHTML = '';
+
+        firebase.firestore().collection('users').doc(userId).get()
+        .then(doc => {
             if (doc.exists) {
                 let userData = doc.data();
-                document.getElementById('user-code').innerHTML = '你的代碼是: ' + userData.usercode;
+                let friendIds = userData.friends || [];
+
+                friendIds.forEach(friendId => {
+                    firebase.firestore().collection('users').doc(friendId).get()
+                    .then(friendDoc => {
+                        if (friendDoc.exists) {
+                            let friendData = friendDoc.data();
+                            let friendElement = document.createElement('div');
+                            friendElement.className = 'friend';
+                            friendElement.innerHTML = `<p>好友名稱: ${friendData.username}</p>`;
+                            friendListDiv.appendChild(friendElement);
+                        }
+                    }).catch(error => console.error("Error loading friend data: ", error));
+                });
             }
-        }).catch(error => {
-            console.error("Error getting user code: ", error);
-        });
+        }).catch(error => console.error("Error loading user data: ", error));
     }
 
     firebase.auth().onAuthStateChanged(user => {
@@ -296,8 +369,8 @@
             document.getElementById('logout-btn').style.display = 'block';
             document.getElementById('google-login-btn').style.display = 'none';
             saveUserData(user);
-            displayUserCode(user.uid);
             loadComments();
+            loadFriendList(user.uid);
         } else {
             document.getElementById('user-info').innerHTML = '';
             document.getElementById('logout-btn').style.display = 'none';
